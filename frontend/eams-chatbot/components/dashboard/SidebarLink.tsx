@@ -20,10 +20,10 @@ export default function SidebarLink({
   return (
     <Link
       href={href}
-      className={`block rounded-md px-3 py-2 text-sm font-medium transition ${
+      className={`block rounded-lg px-3 py-2.5 text-sm font-medium transition ${
         isActive
-          ? "bg-slate-900 text-white"
-          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+          ? "bg-white text-cyan-800 shadow-sm"
+          : "text-cyan-50 hover:bg-cyan-600 hover:text-white"
       }`}
     >
       {label}

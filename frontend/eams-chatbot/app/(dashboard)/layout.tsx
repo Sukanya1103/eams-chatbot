@@ -11,6 +11,7 @@ import AdminSidebar from "@/components/dashboard/AdminSidebar";
 import HrSidebar from "@/components/dashboard/HrSidebar";
 import ManagerSidebar from "@/components/dashboard/ManagerSidebar";
 import EmployeeSidebar from "@/components/dashboard/EmployeeSidebar";
+import ChatLauncher from "@/components/chatbot/ChatLauncher";
 
 export default async function DashboardLayout({
   children,
@@ -28,11 +29,12 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen">
-      <aside className="w-64 shrink-0 border-r border-slate-200 bg-white">
+    <div className="flex min-h-screen bg-cyan-50">
+      <aside className="w-72 shrink-0 bg-cyan-700 shadow-xl shadow-cyan-950/15">
         {renderSidebar(user.role)}
       </aside>
-      <main className="flex-1 p-8">{children}</main>
+      <main className="flex-1 p-5 md:p-8">{children}</main>
+      <ChatLauncher />
     </div>
   );
 }

@@ -8,16 +8,14 @@ const LINKS = [
   { href: "/manager", label: "Overview" },
   { href: "/manager/team-attendance", label: "Team attendance" },
   { href: "/manager/team-leaves", label: "Team leaves" },
-  { href: "/manager/chatbot", label: "Assistant" },
 ];
 
 export default function ManagerSidebar() {
   return (
-    <nav className="flex h-full flex-col justify-between p-4">
+    <nav className="flex h-full flex-col justify-between p-5">
       <div className="space-y-1">
-        <p className="mb-3 px-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
-          Manager
-        </p>
+        <div className="mb-8 px-3"><p className="text-lg font-black tracking-tight text-white">EAMS</p><p className="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-cyan-200">Enterprise portal</p></div>
+        <p className="mb-3 px-3 text-xs font-semibold uppercase tracking-wide text-cyan-200">Manager workspace</p>
         {LINKS.map((link) => (
           <SidebarLink key={link.href} {...link} />
         ))}

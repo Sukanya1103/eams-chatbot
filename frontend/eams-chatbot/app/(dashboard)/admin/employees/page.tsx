@@ -2,8 +2,8 @@
 // Admin's company-wide employee list. Server Component — fetches directly
 // via lib/server/employees.ts, no client-side loading state needed.
 
-import Link from "next/link";
 import { getEmployees } from "@/lib/server/employees";
+import RegisterEmployeeModal from "@/components/employees/RegisterEmployeeModal";
 
 export default async function AdminEmployeesPage() {
   const employees = await getEmployees();
@@ -17,12 +17,7 @@ export default async function AdminEmployeesPage() {
             {employees.length} {employees.length === 1 ? "employee" : "employees"} across the company.
           </p>
         </div>
-        <Link
-          href="/hr/register-employee"
-          className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
-        >
-          Register employee
-        </Link>
+        <RegisterEmployeeModal />
       </div>
 
       {employees.length === 0 ? (
