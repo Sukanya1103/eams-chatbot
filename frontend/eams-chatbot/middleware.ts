@@ -12,7 +12,8 @@ const ROUTE_ACCESS: Record<string, Role[]> = {
   "/admin": ["ADMIN"],
   "/hr": ["HR", "ADMIN"],
   "/manager": ["MANAGER", "ADMIN"],
-  "/employee": ["EMPLOYEE", "ADMIN"],
+  // HR and managers can switch to their personal employee workspace.
+  "/employee": ["EMPLOYEE", "HR", "MANAGER", "ADMIN"],
 };
 
 export function middleware(request: NextRequest) {

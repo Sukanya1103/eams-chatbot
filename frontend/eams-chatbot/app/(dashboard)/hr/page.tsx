@@ -1,42 +1,16 @@
-// app/(dashboard)/hr/page.tsx
-// Landing page after an HR user logs in.
-
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth/getCurrentUser";
-import StatCard from "@/components/ui/StatCard";
+import { getEmployees } from "@/lib/server/employees";
+import { getLeaves } from "@/lib/server/leaves";
+import { getAttendance } from "@/lib/server/attendance";
 
 export default async function HrOverviewPage() {
-  const user = await getCurrentUser();
-
-  return (
-    <div>
-      <h1 className="text-xl font-semibold text-slate-900">
-        Welcome back, {user?.name ?? "there"}
-      </h1>
-      <p className="mt-1 text-sm text-slate-500">
-        Manage employees, leave approvals, and payroll from here.
-      </p>
-
-      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <StatCard label="Active employees" value="—" hint="Connect backend" />
-        <StatCard label="Pending leave requests" value="—" />
-        <StatCard label="Payroll due this month" value="—" />
-      </div>
-
-      <div className="mt-8 flex flex-wrap gap-3">
-        <Link
-          href="/hr/register-employee"
-          className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
-        >
-          Register new employee
-        </Link>
-        <Link
-          href="/hr/leaves"
-          className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-        >
-          Review pending leaves
-        </Link>
-      </div>
-    </div>
-  );
+  const [user, employees, leaves, attendance] = await Promise.all([getCurrentUser(), getEmployees(), getLeaves(), getAttendance()]);
+  const today = new Date().toISOString().slice(0, 10);
+  const presentToday = attendance.filter((record) => record.date === today && record.status === "PRESENT").length;
+  const pendingLeaves = leaves.filter((leave) => leave.status === "PENDING");
+  const departments = new Set(employees.map((employee) => employee.department).filter(Boolean)).size;
+  return <div className="mx-auto max-w-7xl"><header className="rounded-2xl bg-slate-950 px-6 py-7 text-white shadow-xl shadow-slate-950/15"><p className="text-xs font-bold uppercase tracking-[0.18em] text-cyan-300">People operations</p><h1 className="mt-2 text-2xl font-black tracking-tight sm:text-3xl">Good day, {user?.name ?? "HR team"}</h1><p className="mt-2 text-sm text-slate-300">Manage workforce records, leave approvals, and payroll from one place.</p></header><section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><Metric label="Active employees" value={employees.length} detail="Across the organization" /><Metric label="Present today" value={presentToday} detail="Attendance records received" /><Metric label="Awaiting leave review" value={pendingLeaves.length} detail="Requests needing action" /><Metric label="Departments" value={departments} detail="Active business groups" /></section><section className="mt-6 grid gap-6 lg:grid-cols-2"><article className="rounded-2xl border border-cyan-100 bg-white p-6 shadow-sm"><div className="flex justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-cyan-600">Action queue</p><h2 className="mt-1 text-lg font-bold text-slate-950">Leave requests awaiting review</h2></div><Link href="/hr/leaves" className="text-sm font-semibold text-cyan-700">Open all</Link></div>{pendingLeaves.length ? <ul className="mt-5 divide-y divide-slate-100">{pendingLeaves.slice(0, 4).map((leave) => <li key={leave.leaveId} className="flex justify-between gap-4 py-3"><div><p className="font-semibold text-slate-800">{leave.employeeName}</p><p className="text-xs text-slate-500">{leave.type.toLowerCase()} leave · {leave.startDate}</p></div><span className="text-xs font-bold text-amber-700">PENDING</span></li>)}</ul> : <p className="mt-5 rounded-xl bg-cyan-50 px-4 py-8 text-center text-sm text-slate-500">No leave requests need review right now.</p>}</article><article className="rounded-2xl border border-cyan-100 bg-white p-6 shadow-sm"><p className="text-xs font-bold uppercase tracking-[0.16em] text-cyan-600">Quick actions</p><h2 className="mt-1 text-lg font-bold text-slate-950">Manage your workforce</h2><div className="mt-5 grid gap-3"><Action href="/hr/register-employee" title="Add an employee" copy="Create a new employee record" /><Action href="/hr/salary" title="Run payroll" copy="Generate and review payslips" /><Action href="/employee" title="Open my workspace" copy="Switch to your personal dashboard" /></div></article></section></div>;
 }
+function Metric({ label, value, detail }: { label: string; value: number; detail: string }) { return <article className="rounded-2xl border border-cyan-100 bg-white p-5 shadow-sm"><p className="text-sm font-medium text-slate-500">{label}</p><p className="mt-4 text-3xl font-black text-slate-950">{value}</p><p className="mt-1 text-xs text-slate-500">{detail}</p></article>; }
+function Action({ href, title, copy }: { href: string; title: string; copy: string }) { return <Link href={href} className="rounded-xl border border-cyan-100 px-4 py-3 transition hover:bg-cyan-50"><p className="text-sm font-bold text-slate-800">{title}</p><p className="mt-1 text-xs text-slate-500">{copy}</p></Link>; }

@@ -1,44 +1,15 @@
-// app/(dashboard)/manager/page.tsx
-// Landing page after a Manager logs in. All numbers here must come from
-// endpoints already scoped to "my team" by the backend's DataScopeService —
-// this page should never receive or request company-wide data.
-
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth/getCurrentUser";
-import StatCard from "@/components/ui/StatCard";
+import { getAttendance } from "@/lib/server/attendance";
+import { getLeaves } from "@/lib/server/leaves";
 
 export default async function ManagerOverviewPage() {
-  const user = await getCurrentUser();
-
-  return (
-    <div>
-      <h1 className="text-xl font-semibold text-slate-900">
-        Welcome back, {user?.name ?? "there"}
-      </h1>
-      <p className="mt-1 text-sm text-slate-500">
-        A snapshot of the team reporting to you.
-      </p>
-
-      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <StatCard label="Team members" value="—" hint="Connect backend" />
-        <StatCard label="Present today" value="—" />
-        <StatCard label="Pending leave approvals" value="—" />
-      </div>
-
-      <div className="mt-8 flex flex-wrap gap-3">
-        <Link
-          href="/manager/team-leaves"
-          className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
-        >
-          Review pending leaves
-        </Link>
-        <Link
-          href="/manager/team-attendance"
-          className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-        >
-          View team attendance
-        </Link>
-      </div>
-    </div>
-  );
+  const [user, attendance, leaves] = await Promise.all([getCurrentUser(), getAttendance(), getLeaves()]);
+  const today = new Date().toISOString().slice(0, 10);
+  const presentToday = attendance.filter((record) => record.date === today && record.status === "PRESENT").length;
+  const teamMembers = new Set(attendance.map((record) => record.employeeId)).size;
+  const pendingLeaves = leaves.filter((leave) => leave.status === "PENDING");
+  return <div className="mx-auto max-w-7xl"><header className="flex flex-col gap-4 rounded-2xl border border-cyan-100 bg-white px-6 py-6 shadow-sm sm:flex-row sm:items-end sm:justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-cyan-600">Team command centre</p><h1 className="mt-1 text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">Welcome, {user?.name ?? "Manager"}</h1><p className="mt-2 text-sm text-slate-500">See who is available and remove blockers for your team.</p></div><Link href="/employee" className="rounded-lg border border-cyan-200 px-4 py-2 text-sm font-semibold text-cyan-700 hover:bg-cyan-50">My workspace</Link></header><section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><Metric label="Team members" value={teamMembers} detail="Based on available records" /><Metric label="Present today" value={presentToday} detail="Attendance marked today" /><Metric label="Pending approvals" value={pendingLeaves.length} detail="Leave requests to review" /><Metric label="Out / no record" value={Math.max(teamMembers - presentToday, 0)} detail="Needs a follow-up" /></section><section className="mt-6 grid gap-6 lg:grid-cols-2"><article className="rounded-2xl border border-cyan-100 bg-white p-6 shadow-sm"><div className="flex justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-cyan-600">Approval queue</p><h2 className="mt-1 text-lg font-bold text-slate-950">Time-off requests</h2></div><Link href="/manager/team-leaves" className="text-sm font-semibold text-cyan-700">Review all</Link></div>{pendingLeaves.length ? <ul className="mt-5 divide-y divide-slate-100">{pendingLeaves.slice(0, 4).map((leave) => <li key={leave.leaveId} className="flex justify-between gap-4 py-3"><div><p className="font-semibold text-slate-800">{leave.employeeName}</p><p className="text-xs text-slate-500">{leave.type.toLowerCase()} leave · starts {leave.startDate}</p></div><span className="text-xs font-bold text-amber-700">PENDING</span></li>)}</ul> : <p className="mt-5 rounded-xl bg-cyan-50 px-4 py-8 text-center text-sm text-slate-500">Your approval queue is clear.</p>}</article><article className="rounded-2xl border border-cyan-100 bg-white p-6 shadow-sm"><p className="text-xs font-bold uppercase tracking-[0.16em] text-cyan-600">Team actions</p><h2 className="mt-1 text-lg font-bold text-slate-950">Stay ahead of the day</h2><div className="mt-5 grid gap-3"><Action href="/manager/team-attendance" title="Review team attendance" copy="Find missing or late attendance records" /><Action href="/manager/team-leaves" title="Approve leave requests" copy="Keep team availability up to date" /></div></article></section></div>;
 }
+function Metric({ label, value, detail }: { label: string; value: number; detail: string }) { return <article className="rounded-2xl border border-cyan-100 bg-white p-5 shadow-sm"><p className="text-sm font-medium text-slate-500">{label}</p><p className="mt-4 text-3xl font-black text-slate-950">{value}</p><p className="mt-1 text-xs text-slate-500">{detail}</p></article>; }
+function Action({ href, title, copy }: { href: string; title: string; copy: string }) { return <Link href={href} className="rounded-xl border border-cyan-100 px-4 py-4 transition hover:bg-cyan-50"><p className="text-sm font-bold text-slate-800">{title}</p><p className="mt-1 text-xs text-slate-500">{copy}</p></Link>; }

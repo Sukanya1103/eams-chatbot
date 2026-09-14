@@ -20,9 +20,11 @@ const STATUS_STYLES: Record<string, string> = {
 export default function LeaveTable({
   leaves,
   readOnly = false,
+  showEmployeeName = true,
 }: {
   leaves: LeaveResponse[];
   readOnly?: boolean;
+  showEmployeeName?: boolean;
 }) {
   const router = useRouter();
   const [pendingActionId, setPendingActionId] = useState<string | null>(null);
@@ -60,7 +62,7 @@ export default function LeaveTable({
       <table className="w-full text-sm">
         <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
           <tr>
-            <th className="px-4 py-3">Employee</th>
+            {showEmployeeName && <th className="px-4 py-3">Employee</th>}
             <th className="px-4 py-3">Type</th>
             <th className="px-4 py-3">Dates</th>
             <th className="px-4 py-3">Reason</th>
@@ -71,7 +73,7 @@ export default function LeaveTable({
         <tbody className="divide-y divide-slate-100">
           {leaves.map((leave) => (
             <tr key={leave.leaveId} className="hover:bg-slate-50">
-              <td className="px-4 py-3 font-medium text-slate-900">{leave.employeeName}</td>
+              {showEmployeeName && <td className="px-4 py-3 font-medium text-slate-900">{leave.employeeName}</td>}
               <td className="px-4 py-3 text-slate-600">{leave.type}</td>
               <td className="px-4 py-3 text-slate-600">
                 {leave.startDate} → {leave.endDate}

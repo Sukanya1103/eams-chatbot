@@ -18,8 +18,8 @@ export default async function HrSalaryPage() {
         Generate and review payslips across the company.
       </p>
 
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
+      <div className="mt-6">
+        <div>
           {salaries.length === 0 ? (
             <div className="rounded-lg border border-dashed border-slate-300 p-8 text-center text-sm text-slate-500">
               No payslips generated yet.
@@ -58,10 +58,8 @@ export default async function HrSalaryPage() {
           )}
         </div>
 
-        <div>
-          <GenerateSalaryForm />
-        </div>
       </div>
+      <div className="mt-6"><GenerateSalaryForm /></div>
     </div>
   );
 }

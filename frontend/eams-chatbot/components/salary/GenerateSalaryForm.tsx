@@ -13,6 +13,7 @@ const currentDate = new Date();
 
 export default function GenerateSalaryForm() {
   const router = useRouter();
+  const [open, setOpen] = useState(false);
   const [employeeId, setEmployeeId] = useState("");
   const [month, setMonth] = useState(currentDate.getMonth() + 1);
   const [year, setYear] = useState(currentDate.getFullYear());
@@ -40,6 +41,7 @@ export default function GenerateSalaryForm() {
       setBasic("");
       setAllowances("");
       setDeductions("");
+      setOpen(false);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to generate payslip");
@@ -49,8 +51,10 @@ export default function GenerateSalaryForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-lg border border-slate-200 p-5">
-      <h2 className="text-sm font-semibold text-slate-900">Generate payslip</h2>
+    <>
+      <button onClick={() => setOpen(true)} className="rounded-lg bg-cyan-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-cyan-700">Generate payslip</button>
+      {open && <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/45 p-4" role="dialog" aria-modal="true" aria-label="Generate payslip"><form onSubmit={handleSubmit} className="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl border border-cyan-100 bg-white p-6 shadow-2xl">
+      <div className="flex items-start justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-cyan-600">Payroll</p><h2 className="mt-1 text-xl font-bold text-slate-950">Generate payslip</h2></div><button type="button" onClick={() => setOpen(false)} aria-label="Close payslip form" className="rounded-lg px-3 py-1 text-xl text-slate-500 hover:bg-cyan-50">×</button></div>
 
       <div className="mt-4 grid grid-cols-2 gap-3">
         <div className="col-span-2">
@@ -128,6 +132,7 @@ export default function GenerateSalaryForm() {
       >
         {isSubmitting ? "Generating…" : "Generate payslip"}
       </button>
-    </form>
+      </form></div>}
+    </>
   );
 }
