@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
 import java.security.SecureRandom;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -69,6 +70,32 @@ public class EmployeeService {
                 .managerId(employee.getManagerId())
                 .dateOfJoining(employee.getDateOfJoining())
                 .temporaryPassword(temporaryPassword)
+                .build();
+    }
+
+    public List<EmployeeResponse> getEmployees() {
+        return employeeRepository.findAll().stream()
+                .map(this::toEmployeeResponse)
+                .toList();
+    }
+
+    private EmployeeResponse toEmployeeResponse(Employee employee) {
+        User user = userRepository.findByEmployeeId(employee.getId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.INTERNAL_SERVER_ERROR,
+                        "Employee account is missing its user record"
+                ));
+
+        return EmployeeResponse.builder()
+                .employeeId(employee.getId())
+                .userId(user.getId())
+                .name(employee.getName())
+                .email(employee.getEmail())
+                .role(user.getRole())
+                .designation(employee.getDesignation())
+                .department(employee.getDepartment())
+                .managerId(employee.getManagerId())
+                .dateOfJoining(employee.getDateOfJoining())
                 .build();
     }
 
