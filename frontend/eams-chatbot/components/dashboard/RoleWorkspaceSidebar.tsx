@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import LogoutButton from "./LogoutButton";
 import SidebarLink from "./SidebarLink";
+import SidebarHeader, { type SidebarCollapseProps } from "./SidebarHeader";
 
 type WorkspaceRole = "HR" | "MANAGER";
 
@@ -36,7 +37,11 @@ const ROLE_CONFIG = {
   },
 } as const;
 
-export default function RoleWorkspaceSidebar({ role }: { role: WorkspaceRole }) {
+export default function RoleWorkspaceSidebar({
+  role,
+  collapsed,
+  onToggle,
+}: { role: WorkspaceRole } & SidebarCollapseProps) {
   const pathname = usePathname();
   const isSelfWorkspace = pathname.startsWith("/employee");
   const config = ROLE_CONFIG[role];
@@ -44,30 +49,33 @@ export default function RoleWorkspaceSidebar({ role }: { role: WorkspaceRole }) 
   const links = isSelfWorkspace ? SELF_LINKS : config.roleLinks;
 
   return (
-    <nav className="flex h-full flex-col justify-between p-5">
+    <nav className={`flex h-full flex-col justify-between ${collapsed ? "p-3" : "p-5"}`}>
       <div className="space-y-1">
-        <div className="mb-7 px-3">
-          <p className="text-lg font-black tracking-tight text-white">EAMS</p>
-          <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-cyan-200">Enterprise portal</p>
-        </div>
+        <SidebarHeader collapsed={collapsed} onToggle={onToggle} />
 
         <Link
           href={destination}
-          className="mb-6 flex items-center justify-between rounded-xl border border-cyan-400/50 bg-cyan-800/40 px-3 py-3 text-left transition hover:bg-cyan-600"
+          aria-label={isSelfWorkspace ? "Switch to role workspace" : "Switch to my workspace"}
+          title={collapsed ? (isSelfWorkspace ? "Switch to role workspace" : "Switch to my workspace") : undefined}
+          className={`mb-6 flex items-center rounded-xl border border-cyan-400/50 bg-cyan-800/40 py-3 text-left transition hover:bg-cyan-600 ${
+            collapsed ? "justify-center px-2" : "justify-between px-3"
+          }`}
         >
-          <span>
+          {collapsed ? (
+            <span aria-hidden="true" className="text-sm font-bold text-white">↔</span>
+          ) : <span>
             <span className="block text-[10px] font-bold uppercase tracking-[0.14em] text-cyan-200">Viewing</span>
             <span className="mt-0.5 block text-sm font-bold text-white">{isSelfWorkspace ? "My workspace" : config.label}</span>
-          </span>
-          <span className="rounded-lg bg-white/15 px-2 py-1 text-xs font-semibold text-white">Switch</span>
+          </span>}
+          {!collapsed && <span className="rounded-lg bg-white/15 px-2 py-1 text-xs font-semibold text-white">Switch</span>}
         </Link>
 
-        <p className="mb-3 px-3 text-xs font-semibold uppercase tracking-wide text-cyan-200">
+        {!collapsed && <p className="mb-3 px-3 text-xs font-semibold uppercase tracking-wide text-cyan-200">
           {isSelfWorkspace ? "My workspace" : config.label}
-        </p>
-        {links.map((link) => <SidebarLink key={link.href} {...link} />)}
+        </p>}
+        {links.map((link) => <SidebarLink key={link.href} {...link} collapsed={collapsed} />)}
       </div>
-      <LogoutButton />
+      <LogoutButton collapsed={collapsed} />
     </nav>
   );
 }

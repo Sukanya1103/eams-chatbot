@@ -7,11 +7,8 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { decodeSession, AUTH_COOKIE_NAME } from "@/lib/auth/session";
-import AdminSidebar from "@/components/dashboard/AdminSidebar";
-import HrSidebar from "@/components/dashboard/HrSidebar";
-import ManagerSidebar from "@/components/dashboard/ManagerSidebar";
-import EmployeeSidebar from "@/components/dashboard/EmployeeSidebar";
 import ChatLauncher from "@/components/chatbot/ChatLauncher";
+import DashboardShell from "@/components/dashboard/DashboardShell";
 
 export default async function DashboardLayout({
   children,
@@ -29,25 +26,9 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-cyan-50">
-      <aside className="w-72 shrink-0 bg-cyan-700 shadow-xl shadow-cyan-950/15">
-        {renderSidebar(user.role)}
-      </aside>
-      <main className="flex-1 p-5 md:p-8">{children}</main>
+    <>
+      <DashboardShell role={user.role}>{children}</DashboardShell>
       <ChatLauncher />
-    </div>
+    </>
   );
-}
-
-function renderSidebar(role: string) {
-  switch (role) {
-    case "ADMIN":
-      return <AdminSidebar />;
-    case "HR":
-      return <HrSidebar />;
-    case "MANAGER":
-      return <ManagerSidebar />;
-    default:
-      return <EmployeeSidebar />;
-  }
 }
