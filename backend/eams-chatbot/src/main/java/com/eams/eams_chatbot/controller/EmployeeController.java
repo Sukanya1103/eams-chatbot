@@ -7,10 +7,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/employees")
@@ -26,5 +29,11 @@ public class EmployeeController {
     @PostMapping("/register")
     public ResponseEntity<EmployeeResponse> register(@Valid @RequestBody RegisterEmployeeRequest request) {
         return ResponseEntity.ok(employeeService.registerEmployee(request));
+    }
+
+    @PreAuthorize("hasAnyRole('HR', 'ADMIN')")
+    @GetMapping
+    public ResponseEntity<List<EmployeeResponse>> list() {
+        return ResponseEntity.ok(employeeService.getEmployees());
     }
 }

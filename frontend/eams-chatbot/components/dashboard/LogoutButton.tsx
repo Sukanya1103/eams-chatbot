@@ -7,7 +7,7 @@
 import { useRouter } from "next/navigation";
 import { logout } from "@/lib/api/auth";
 
-export default function LogoutButton() {
+export default function LogoutButton({ collapsed = false }: { collapsed?: boolean }) {
   const router = useRouter();
 
   async function handleLogout() {
@@ -19,9 +19,13 @@ export default function LogoutButton() {
   return (
     <button
       onClick={handleLogout}
-      className="w-full rounded-lg border border-cyan-500/70 px-3 py-2.5 text-left text-sm font-medium text-cyan-50 transition hover:bg-cyan-600 hover:text-white"
+      aria-label="Sign out"
+      title={collapsed ? "Sign out" : undefined}
+      className={`w-full rounded-lg border border-cyan-500/70 px-3 py-2.5 text-sm font-medium text-cyan-50 transition hover:bg-cyan-600 hover:text-white ${
+        collapsed ? "text-center" : "text-left"
+      }`}
     >
-      Sign out
+      {collapsed ? "↗" : "Sign out"}
     </button>
   );
 }
