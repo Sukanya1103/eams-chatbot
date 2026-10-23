@@ -3,57 +3,52 @@ import { getCurrentUser } from "@/lib/auth/getCurrentUser";
 import { getAttendance } from "@/lib/server/attendance";
 import { getLeaves } from "@/lib/server/leaves";
 import CheckInOutCard from "@/components/attendance/CheckInOutCard";
+import { employeeDisplayName } from "./employeeName";
 
 export default async function EmployeeOverviewPage() {
   const [user, attendance, leaves] = await Promise.all([getCurrentUser(), getAttendance(), getLeaves()]);
   const now = new Date();
-  const today = now.toISOString().slice(0, 10);
-  const monthKey = today.slice(0, 7);
+  const name = employeeDisplayName(user?.name) ?? "there";
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
   const todayRecord = attendance.find((record) => record.date === today);
-  const presentThisMonth = attendance.filter((record) => record.date.startsWith(monthKey) && record.status === "PRESENT").length;
-  const pendingLeaves = leaves.filter((leave) => leave.status === "PENDING").length;
-  const upcomingLeave = leaves.filter((leave) => leave.status === "APPROVED" && leave.startDate >= today).sort((a, b) => a.startDate.localeCompare(b.startDate))[0];
-  const week = getWeek(today);
+  const days = currentWeek(today);
   const weekRecords = new Map(attendance.map((record) => [record.date, record]));
-  const weekPresent = attendance.filter((record) => week.includes(record.date) && record.status === "PRESENT").length;
-  const dateLabel = new Intl.DateTimeFormat("en-IN", { weekday: "long", day: "numeric", month: "short" }).format(now);
+  const present = days.filter((day) => weekRecords.get(day)?.status === "PRESENT").length;
+  const pending = leaves.filter((leave) => leave.status === "PENDING").length;
+  const upcoming = leaves.filter((leave) => leave.status === "APPROVED" && leave.startDate >= today).sort((a, b) => a.startDate.localeCompare(b.startDate))[0];
+  const worked = todayRecord?.checkIn && todayRecord.checkOut ? duration(todayRecord.checkIn, todayRecord.checkOut) : null;
 
-  return <div className="mx-auto max-w-7xl">
-    <header className="flex flex-col gap-4 rounded-2xl border border-cyan-100 bg-white px-6 py-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-      <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-cyan-600">{dateLabel}</p><h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">Welcome back, {user?.name ?? "there"}</h1><p className="mt-1 text-sm text-slate-500">Here&apos;s your workday at a glance.</p></div>
-      <div className="rounded-xl bg-cyan-50 px-4 py-3 text-sm"><p className="text-xs font-semibold uppercase tracking-wide text-cyan-700">Today&apos;s status</p><p className="mt-1 font-semibold text-slate-950">{todayRecord?.checkOut ? "Day completed" : todayRecord?.checkIn ? "Checked in" : "Ready to start"}</p></div>
+  return <div className="mx-auto max-w-[1500px] space-y-6">
+    <header className="flex flex-col justify-between gap-5 rounded-2xl border border-slate-700 bg-[#171b22] p-5 text-white shadow-lg sm:flex-row sm:items-center sm:px-7">
+      <div><p className="text-xs font-semibold uppercase tracking-[.16em] text-cyan-300">{new Intl.DateTimeFormat("en-IN", { weekday: "long", month: "short", day: "numeric" }).format(now)}</p><h1 className="mt-2 text-2xl font-bold sm:text-3xl">Welcome back, <span className="text-cyan-200">{name}</span></h1><p className="mt-1 text-sm text-slate-400">Your workday, attendance, and requests at a glance.</p></div>
+      <CheckInOutCard today={todayRecord} />
     </header>
 
-    <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      <Metric title="Attendance" value={todayRecord?.checkIn ? "Active" : "Not started"} detail={todayRecord?.checkIn ? `Checked in ${formatTime(todayRecord.checkIn)}` : "Check in when your workday begins"} tone="cyan" />
-      <Metric title="Present this month" value={presentThisMonth} detail="Working days recorded" tone="blue" />
-      <Metric title="Leave requests" value={pendingLeaves} detail={pendingLeaves === 1 ? "Request awaiting approval" : "Requests awaiting approval"} tone="violet" />
-      <Metric title="Upcoming leave" value={upcomingLeave ? formatShortDate(upcomingLeave.startDate) : "None"} detail={upcomingLeave ? `${upcomingLeave.type.toLowerCase()} leave approved` : "No approved leave planned"} tone="amber" />
+    <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <Metric label="Today’s status" value={todayRecord?.checkOut ? "Complete" : todayRecord?.checkIn ? "Active" : "Not started"} detail={todayRecord?.checkIn ? `Checked in at ${new Date(todayRecord.checkIn).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" })}` : "Check in when your day begins"} tone="green" />
+      <Metric label="Time worked today" value={worked ?? "—"} detail={worked ? "From your recorded check-in and check-out" : "Available after check-out is recorded"} tone="cyan" />
+      <Metric label="Pending leave requests" value={pending} detail="Your requests awaiting a decision" tone="amber" />
+      <Metric label="Upcoming approved leave" value={upcoming ? shortDate(upcoming.startDate) : "None"} detail={upcoming ? `${pretty(upcoming.type)} leave` : "No upcoming approved leave"} tone="violet" />
     </section>
 
-    <section className="mt-6 grid gap-6 xl:grid-cols-3">
-      <article className="rounded-2xl border border-cyan-100 bg-white p-6 shadow-sm xl:col-span-2">
-        <div className="flex items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-cyan-600">Weekly attendance</p><h2 className="mt-1 text-lg font-bold text-slate-950">Keep your week on track</h2><p className="mt-1 text-sm text-slate-500">Your attendance recorded for the current week.</p></div><Link href="/employee/my-attendance" className="shrink-0 text-sm font-semibold text-cyan-700 hover:text-cyan-800">View history</Link></div>
-        <div className="mt-8 grid grid-cols-7 gap-3 sm:gap-5">{week.map((date) => { const record = weekRecords.get(date); const isToday = date === today; return <div key={date} className="text-center"><div className={`mx-auto grid h-16 w-full max-w-14 place-items-center rounded-xl border text-sm font-bold ${record?.status === "PRESENT" ? "border-cyan-200 bg-cyan-500 text-white" : isToday ? "border-cyan-300 bg-cyan-50 text-cyan-700" : "border-slate-100 bg-slate-50 text-slate-400"}`}>{record?.status === "PRESENT" ? "✓" : formatDay(date)}</div><p className="mt-2 text-xs font-semibold text-slate-700">{formatWeekday(date)}</p><p className="mt-0.5 text-[10px] text-slate-400">{formatDay(date)}</p></div>; })}</div>
-        <div className="mt-7 h-2 overflow-hidden rounded-full bg-cyan-50"><div className="h-full rounded-full bg-cyan-500" style={{ width: `${Math.min((weekPresent / 5) * 100, 100)}%` }} /></div><p className="mt-2 text-xs text-slate-500">{weekPresent} of 5 weekday attendance records completed</p>
+    <section className="grid gap-5 xl:grid-cols-[minmax(0,1.8fr)_minmax(300px,1fr)]">
+      <article className="rounded-2xl border border-slate-700 bg-[#171b22] p-5 text-white shadow-lg sm:p-7">
+        <div className="flex flex-wrap items-end justify-between gap-3"><div><p className="text-xs font-semibold uppercase tracking-[.16em] text-cyan-300">Attendance</p><h2 className="mt-1 text-xl font-bold">Your week at a glance</h2><p className="mt-1 text-sm text-slate-400">Based on your personal attendance records.</p></div><Link href="/employee/my-attendance" className="text-sm font-semibold text-cyan-300 hover:text-cyan-200">View history →</Link></div>
+        <div className="mt-7 grid grid-cols-7 gap-2 sm:gap-4">{days.map((day) => { const record = weekRecords.get(day); const isToday = day === today; return <div key={day} className="text-center"><div className={`mx-auto grid aspect-[.72] max-h-32 w-full place-items-end overflow-hidden rounded-xl border p-1.5 ${record?.status === "PRESENT" ? "border-cyan-500/50 bg-cyan-500/10" : "border-slate-700 bg-slate-800/70"}`}><div className={`w-full rounded-md ${record?.status === "PRESENT" ? "h-[70%] bg-gradient-to-t from-blue-600 to-cyan-400" : "h-2 bg-slate-700"}`} /></div><p className={`mt-2 text-xs font-semibold ${isToday ? "text-cyan-300" : "text-slate-300"}`}>{new Intl.DateTimeFormat("en-IN", { weekday: "short" }).format(new Date(`${day}T12:00:00`))}</p><p className="mt-0.5 text-[11px] text-slate-500">{new Date(`${day}T12:00:00`).getDate()}</p></div>; })}</div>
+        <div className="mt-5 h-2 overflow-hidden rounded-full bg-slate-800"><div className="h-full rounded-full bg-gradient-to-r from-blue-600 to-cyan-400" style={{ width: `${Math.round((present / 5) * 100)}%` }} /></div><p className="mt-2 text-xs text-slate-400">{present} weekday attendance record{present === 1 ? "" : "s"} this week</p>
       </article>
-      <CheckInOutCard today={todayRecord} />
-    </section>
-
-    <section className="mt-6 grid gap-6 md:grid-cols-2">
-      <article className="rounded-2xl border border-cyan-100 bg-white p-6 shadow-sm"><p className="text-xs font-bold uppercase tracking-[0.16em] text-cyan-600">Time off</p><h2 className="mt-1 text-lg font-bold text-slate-950">Leave centre</h2><p className="mt-2 text-sm text-slate-500">Plan time away and follow the status of your requests.</p><Link href="/employee/my-leaves" className="mt-5 inline-flex rounded-lg bg-cyan-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-cyan-700">Manage my leaves</Link></article>
-      <article className="rounded-2xl border border-cyan-100 bg-white p-6 shadow-sm"><p className="text-xs font-bold uppercase tracking-[0.16em] text-cyan-600">Payroll</p><h2 className="mt-1 text-lg font-bold text-slate-950">Payslips & salary</h2><p className="mt-2 text-sm text-slate-500">View your salary records and download the latest payslip.</p><Link href="/employee/my-salary" className="mt-5 inline-flex rounded-lg border border-cyan-200 px-4 py-2.5 text-sm font-semibold text-cyan-700 transition hover:bg-cyan-50">View salary details</Link></article>
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+        <Shortcut href="/employee/my-leaves" eyebrow="Time off" title="Leave centre" detail="Apply and follow your leave requests." action="Manage leave" tone="green" />
+        <Shortcut href="/employee/my-salary" eyebrow="Payroll" title="Salary records" detail="Review your available payslip details." action="View salary" tone="amber" />
+        <Shortcut href="/employee/chatbot" eyebrow="Support" title="EAMS Assistant" detail="Ask a question using the workplace assistant." action="Open chatbot" tone="cyan" />
+      </div>
     </section>
   </div>;
 }
 
-function Metric({ title, value, detail, tone }: { title: string; value: string | number; detail: string; tone: "cyan" | "blue" | "violet" | "amber" }) {
-  const colours = { cyan: "bg-cyan-100 text-cyan-700", blue: "bg-blue-100 text-blue-700", violet: "bg-violet-100 text-violet-700", amber: "bg-amber-100 text-amber-700" };
-  return <article className="rounded-2xl border border-cyan-100 bg-white p-5 shadow-sm"><div className="flex items-start justify-between"><p className="text-sm font-medium text-slate-500">{title}</p><span className={`grid h-9 w-9 place-items-center rounded-xl text-sm ${colours[tone]}`}>●</span></div><p className="mt-5 text-2xl font-bold text-slate-950">{value}</p><p className="mt-1 text-xs text-slate-500">{detail}</p></article>;
-}
-
-function getWeek(today: string) { const current = new Date(`${today}T12:00:00`); current.setDate(current.getDate() - ((current.getDay() + 6) % 7)); return Array.from({ length: 7 }, (_, index) => { const day = new Date(current); day.setDate(current.getDate() + index); return day.toISOString().slice(0, 10); }); }
-function formatWeekday(date: string) { return new Intl.DateTimeFormat("en-IN", { weekday: "short" }).format(new Date(`${date}T12:00:00`)); }
-function formatDay(date: string) { return new Intl.DateTimeFormat("en-IN", { day: "numeric" }).format(new Date(`${date}T12:00:00`)); }
-function formatShortDate(date: string) { return new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short" }).format(new Date(`${date}T12:00:00`)); }
-function formatTime(date?: string) { return date ? new Intl.DateTimeFormat("en-IN", { hour: "numeric", minute: "2-digit" }).format(new Date(date)) : ""; }
+function Metric({ label, value, detail, tone }: { label: string; value: string | number; detail: string; tone: string }) { const tint: Record<string, string> = { green: "text-emerald-300", cyan: "text-cyan-300", amber: "text-amber-300", violet: "text-violet-300" }; return <article className="rounded-2xl border border-slate-700 bg-[#20252d] p-5 text-white shadow-md"><p className="text-sm text-slate-400">{label}</p><p className={`mt-4 text-2xl font-bold ${tint[tone]}`}>{value}</p><p className="mt-1 text-xs leading-5 text-slate-400">{detail}</p></article>; }
+function Shortcut({ href, eyebrow, title, detail, action, tone }: { href: string; eyebrow: string; title: string; detail: string; action: string; tone: string }) { const tint: Record<string, string> = { green: "text-emerald-300", cyan: "text-cyan-300", amber: "text-amber-300" }; return <article className="rounded-2xl border border-slate-700 bg-[#20252d] p-5 text-white shadow-md"><p className={`text-xs font-bold uppercase tracking-[.14em] ${tint[tone]}`}>{eyebrow}</p><h3 className="mt-2 font-bold">{title}</h3><p className="mt-1 text-sm text-slate-400">{detail}</p><Link href={href} className="mt-4 inline-flex rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 px-4 py-2 text-sm font-semibold text-white hover:brightness-110">{action}</Link></article>; }
+function currentWeek(today: string) { const start = new Date(`${today}T12:00:00`); start.setDate(start.getDate() - ((start.getDay() + 6) % 7)); return Array.from({ length: 7 }, (_, index) => { const date = new Date(start); date.setDate(start.getDate() + index); return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`; }); }
+function duration(start: string, end: string) { const minutes = Math.max(0, Math.round((new Date(end).getTime() - new Date(start).getTime()) / 60000)); return `${Math.floor(minutes / 60)}h ${minutes % 60}m`; }
+function shortDate(value: string) { return new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short" }).format(new Date(`${value}T12:00:00`)); }
+function pretty(value: string) { return value.charAt(0) + value.slice(1).toLowerCase(); }

@@ -42,8 +42,8 @@ export default function CheckInOutCard({ today }: { today: AttendanceResponse | 
   }
 
   return (
-    <div className="rounded-lg border border-slate-200 p-5">
-      <h2 className="text-sm font-semibold text-slate-900">Today</h2>
+    <div className="min-w-64 rounded-xl border border-slate-700 bg-[#20252d] p-4 text-white shadow-lg">
+      <h2 className="text-xs font-bold uppercase tracking-wide text-slate-400">Current status</h2>
 
       {!today?.checkIn ? (
         <>
@@ -51,7 +51,7 @@ export default function CheckInOutCard({ today }: { today: AttendanceResponse | 
           <button
             onClick={handleCheckIn}
             disabled={isSubmitting}
-            className="mt-4 w-full rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+            className="mt-3 w-full rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 px-4 py-2.5 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300"
           >
             {isSubmitting ? "Checking in…" : "Check in"}
           </button>
@@ -64,7 +64,7 @@ export default function CheckInOutCard({ today }: { today: AttendanceResponse | 
           <button
             onClick={handleCheckOut}
             disabled={isSubmitting}
-            className="mt-4 w-full rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+            className="mt-3 w-full rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 px-4 py-2.5 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300"
           >
             {isSubmitting ? "Checking out…" : "Check out"}
           </button>

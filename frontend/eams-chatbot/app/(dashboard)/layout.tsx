@@ -9,6 +9,7 @@ import { redirect } from "next/navigation";
 import { decodeSession, AUTH_COOKIE_NAME } from "@/lib/auth/session";
 import ChatLauncher from "@/components/chatbot/ChatLauncher";
 import DashboardShell from "@/components/dashboard/DashboardShell";
+import { employeeDisplayName } from "./employee/employeeName";
 
 export default async function DashboardLayout({
   children,
@@ -27,7 +28,7 @@ export default async function DashboardLayout({
 
   return (
     <>
-      <DashboardShell role={user.role}>{children}</DashboardShell>
+      <DashboardShell role={user.role} employeeName={user.role === "EMPLOYEE" ? employeeDisplayName(user.name) ?? undefined : undefined}>{children}</DashboardShell>
       <ChatLauncher />
     </>
   );
