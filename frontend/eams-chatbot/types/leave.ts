@@ -11,6 +11,9 @@ export interface LeaveResponse {
   startDate: string; // ISO date
   endDate: string; // ISO date
   reason: string;
+  halfDay?: boolean;
+  submittedAt?: string;
+  reviewerComments?: string;
   status: LeaveStatus;
   approvedBy?: string;
 }
@@ -20,4 +23,5 @@ export interface ApplyLeaveRequest {
   startDate: string;
   endDate: string;
   reason: string;
+  halfDay: boolean;
 }

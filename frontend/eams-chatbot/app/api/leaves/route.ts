@@ -73,11 +73,6 @@ export async function POST(request: NextRequest) {
     }
 
     if (!backendRes.ok) {
-      console.error("Backend leave submission failed:", {
-        status: backendRes.status,
-        response: data,
-      });
-
       const message =
         typeof data === "object" &&
         data !== null &&

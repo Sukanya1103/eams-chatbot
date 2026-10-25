@@ -6,10 +6,15 @@
 
 export async function checkIn(): Promise<void> {
   const res = await fetch("/api/attendance/check-in", { method: "POST" });
-  if (!res.ok) throw new Error("Failed to check in");
+  if (!res.ok) throw new Error(await errorMessage(res, "Failed to check in"));
 }
 
 export async function checkOut(): Promise<void> {
   const res = await fetch("/api/attendance/check-out", { method: "POST" });
-  if (!res.ok) throw new Error("Failed to check out");
+  if (!res.ok) throw new Error(await errorMessage(res, "Failed to check out"));
+}
+
+async function errorMessage(res: Response, fallback: string) {
+  const data = await res.json().catch(() => null);
+  return typeof data?.message === "string" ? data.message : fallback;
 }
