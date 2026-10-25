@@ -3,6 +3,7 @@ import { getLeaves } from "@/lib/server/leaves";
 import ApplyLeaveForm from "@/components/leaves/ApplyLeaveForm";
 import EmployeeLeaveRequests from "../EmployeeLeaveRequests";
 import { employeeDisplayName } from "../employeeName";
+import CompensationRequestsPanel from "@/components/leaves/CompensationRequestsPanel";
 
 export default async function MyLeavesPage() {
   const [user, leaves] = await Promise.all([getCurrentUser(), getLeaves()]);
@@ -17,7 +18,7 @@ export default async function MyLeavesPage() {
     <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><Metric label="Casual leave requests" value={count("CASUAL")} tone="cyan" /><Metric label="Sick leave requests" value={count("SICK")} tone="violet" /><Metric label="Approved requests" value={approved} tone="emerald" /><Metric label="Pending requests" value={pending} tone="amber" /></section>
     <p className="mt-3 rounded-lg border border-slate-700 bg-[#171b22] px-4 py-3 text-sm text-slate-400">Leave balances are unavailable here; the connected leave API provides request records only.</p>
     <section className="mt-6 rounded-2xl border border-slate-700 bg-[#171b22] p-6 text-white shadow-lg"><div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-cyan-300">Leave requests</p><h2 className="mt-1 text-lg font-bold">Request history</h2><p className="mt-1 text-sm text-slate-400">All leave requests you have submitted.</p></div><EmployeeLeaveRequests leaves={leaves} /></div></section>
-    <section className="mt-6"><article className="rounded-2xl border border-slate-700 bg-[#171b22] p-6 text-white shadow-lg"><p className="text-xs font-bold uppercase tracking-[0.16em] text-cyan-300">Compensation requests</p><h2 className="mt-1 text-lg font-bold">Week-off &amp; holiday compensation</h2><p className="mt-1 text-sm text-slate-400">Compensation request history is not connected in this application yet.</p><div className="mt-5 grid min-h-28 place-items-center rounded-xl border border-dashed border-slate-600 text-center text-sm text-slate-400">No compensation request data available.</div></article></section>
+    <section className="mt-6"><CompensationRequestsPanel /></section>
   </div>;
 }
 
