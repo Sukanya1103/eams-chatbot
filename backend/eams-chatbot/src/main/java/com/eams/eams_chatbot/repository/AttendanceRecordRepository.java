@@ -8,6 +8,7 @@ import java.util.Optional;
 
 public interface AttendanceRecordRepository extends MongoRepository<AttendanceRecord, String> {
     Optional<AttendanceRecord> findByEmployeeIdAndDate(String employeeId, LocalDate date);
+    Optional<AttendanceRecord> findFirstByEmployeeIdAndCheckOutIsNullOrderByDateDesc(String employeeId);
     List<AttendanceRecord> findByEmployeeIdOrderByDateDesc(String employeeId);
     List<AttendanceRecord> findAllByOrderByDateDesc();
 }
