@@ -28,13 +28,17 @@ public class JwtTokenProvider {
     }
 
     public String generateAccessToken(User user) {
+        return generateAccessToken(user, user.getEmail());
+    }
+
+    public String generateAccessToken(User user, String name) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + accessTokenExpiryMs);
 
         return Jwts.builder()
                 .subject(user.getId())
                 .claim("email", user.getEmail())
-                .claim("name", user.getEmail()) // replaced with real name once Employee lookup is wired in AuthService
+                .claim("name", name)
                 .claim("role", user.getRole().name())
                 .claim("employeeId", user.getEmployeeId())
                 .issuedAt(now)

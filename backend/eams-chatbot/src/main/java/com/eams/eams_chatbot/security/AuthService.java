@@ -4,6 +4,7 @@ import com.eams.eams_chatbot.dto.request.LoginRequest;
 import com.eams.eams_chatbot.dto.response.LoginResponse;
 import com.eams.eams_chatbot.model.User;
 import com.eams.eams_chatbot.repository.UserRepository;
+import com.eams.eams_chatbot.repository.EmployeeRepository;
 import com.eams.eams_chatbot.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -17,6 +18,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final EmployeeRepository employeeRepository;
 
     public LoginResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
@@ -30,7 +32,9 @@ public class AuthService {
             throw new BadCredentialsException("Invalid email or password");
         }
 
-        String accessToken = jwtTokenProvider.generateAccessToken(user);
+        var employee = user.getEmployeeId() == null ? null : employeeRepository.findById(user.getEmployeeId()).orElse(null);
+        String displayName = employee != null && employee.getName() != null ? employee.getName() : user.getEmail();
+        String accessToken = jwtTokenProvider.generateAccessToken(user, displayName);
 
         // TODO: once the Employee module exists, look up the Employee by
         // user.getEmployeeId() and use its real name + managerId here
@@ -38,10 +42,10 @@ public class AuthService {
         LoginResponse.UserSummary userSummary = LoginResponse.UserSummary.builder()
                 .userId(user.getId())
                 .employeeId(user.getEmployeeId())
-                .name(user.getEmail())
+                .name(displayName)
                 .email(user.getEmail())
                 .role(user.getRole())
-                .managerId(null)
+                .managerId(employee == null ? null : employee.getManagerId())
                 .build();
 
         return LoginResponse.builder()
