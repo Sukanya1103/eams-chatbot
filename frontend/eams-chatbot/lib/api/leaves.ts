@@ -14,11 +14,35 @@ export async function rejectLeave(leaveId: string): Promise<void> {
   if (!res.ok) throw new Error("Failed to reject leave");
 }
 
+// export async function applyLeave(data: ApplyLeaveRequest): Promise<void> {
+//   const res = await fetch("/api/leaves", {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify(data),
+//   });
+//   if (!res.ok) throw new Error("Failed to submit leave request");
+// }
 export async function applyLeave(data: ApplyLeaveRequest): Promise<void> {
   const res = await fetch("/api/leaves", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error("Failed to submit leave request");
+
+  if (!res.ok) {
+    const errorText = await res.text();
+
+    console.error("Apply leave API error:", {
+      status: res.status,
+      message: errorText,
+      request: data,
+    });
+
+    throw new Error(
+      errorText || `Failed to submit leave request (${res.status})`
+    );
+  }
 }
+

@@ -9,33 +9,96 @@ import { AUTH_COOKIE_NAME } from "@/lib/auth/session";
 
 const BACKEND_URL = process.env.BACKEND_URL ?? "http://localhost:8081";
 
+// export async function POST(request: NextRequest) {
+//   const cookieStore = await cookies();
+//   const token = cookieStore.get(AUTH_COOKIE_NAME)?.value;
+
+//   if (!token) {
+//     return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
+//   }
+
+//   const body = await request.json();
+
+//   const backendRes = await fetch(`${BACKEND_URL}/api/leaves`, {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//       Authorization: `Bearer ${token}`,
+//     },
+//     body: JSON.stringify(body),
+//   });
+
+//   const data = await backendRes.json().catch(() => null);
+
+//   if (!backendRes.ok) {
+//     return NextResponse.json(
+//       { message: data?.message ?? "Failed to submit leave request" },
+//       { status: backendRes.status }
+//     );
+//   }
+
+//   return NextResponse.json(data);
+// }
 export async function POST(request: NextRequest) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(AUTH_COOKIE_NAME)?.value;
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get(AUTH_COOKIE_NAME)?.value;
 
-  if (!token) {
-    return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
-  }
+    if (!token) {
+      return NextResponse.json(
+        { message: "Not authenticated" },
+        { status: 401 }
+      );
+    }
 
-  const body = await request.json();
+    const body = await request.json();
 
-  const backendRes = await fetch(`${BACKEND_URL}/api/leaves`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(body),
-  });
+    const backendRes = await fetch(`${BACKEND_URL}/api/leaves`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(body),
+    });
 
-  const data = await backendRes.json().catch(() => null);
+    const responseText = await backendRes.text();
 
-  if (!backendRes.ok) {
+    let data: unknown = null;
+
+    try {
+      data = responseText ? JSON.parse(responseText) : null;
+    } catch {
+      data = { message: responseText || "Empty response from backend" };
+    }
+
+    if (!backendRes.ok) {
+      console.error("Backend leave submission failed:", {
+        status: backendRes.status,
+        response: data,
+      });
+
+      const message =
+        typeof data === "object" &&
+        data !== null &&
+        "message" in data &&
+        typeof data.message === "string"
+          ? data.message
+          : "Failed to submit leave request";
+
+      return NextResponse.json(
+        { message },
+        { status: backendRes.status }
+      );
+    }
+
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error("Leave submission route failed:", error);
+
     return NextResponse.json(
-      { message: data?.message ?? "Failed to submit leave request" },
-      { status: backendRes.status }
+      { message: "Unable to process leave request. Check server logs." },
+      { status: 500 }
     );
   }
-
-  return NextResponse.json(data);
 }
