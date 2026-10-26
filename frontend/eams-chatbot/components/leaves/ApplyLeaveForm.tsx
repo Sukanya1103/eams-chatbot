@@ -21,7 +21,7 @@ export default function ApplyLeaveForm() {
   function close() { setOpen(false); setError(null); }
   async function handleSubmit(event: FormEvent) {
     event.preventDefault(); setError(null); setIsSubmitting(true);
-    try { await applyLeave({ type, startDate, endDate, reason: halfDay === "YES" ? `[Half day] ${reason}` : reason }); setStartDate(""); setEndDate(""); setReason(""); setHalfDay("NO"); close(); router.refresh(); }
+    try { await applyLeave({ type, startDate, endDate, reason, halfDay: halfDay === "YES" }); setStartDate(""); setEndDate(""); setReason(""); setHalfDay("NO"); close(); router.refresh(); }
     catch (caught) { setError(caught instanceof Error ? caught.message : "Failed to submit request"); }
     finally { setIsSubmitting(false); }
   }
