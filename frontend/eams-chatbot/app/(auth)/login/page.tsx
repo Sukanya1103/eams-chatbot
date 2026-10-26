@@ -8,6 +8,14 @@
 import { Suspense, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { login } from "@/lib/api/auth";
+import { ROLE_HOME, type Role } from "@/types/user";
+
+const ROLE_REDIRECT_PREFIXES: Record<Role, string[]> = {
+  ADMIN: ["/admin"],
+  HR: ["/hr", "/employee"],
+  MANAGER: ["/manager", "/employee"],
+  EMPLOYEE: ["/employee"],
+};
 
 export default function LoginPage() {
   return <Suspense fallback={<main className="min-h-screen bg-cyan-50" />}><LoginForm /></Suspense>;
@@ -30,7 +38,10 @@ function LoginForm() {
 
     try {
       const { user } = await login({ email, password });
-      router.push(redirectTo ?? roleHome(user.role));
+      const allowedRedirect = redirectTo && ROLE_REDIRECT_PREFIXES[user.role].some(
+        (prefix) => redirectTo === prefix || redirectTo.startsWith(`${prefix}/`),
+      );
+      router.push(allowedRedirect ? redirectTo : ROLE_HOME[user.role]);
       router.refresh();
     } catch {
       setError("That email or password isn't right. Try again.");
@@ -101,17 +112,4 @@ function LoginForm() {
       </div>
     </main>
   );
-}
-
-function roleHome(role: string) {
-  switch (role) {
-    case "ADMIN":
-      return "/admin";
-    case "HR":
-      return "/hr";
-    case "MANAGER":
-      return "/manager";
-    default:
-      return "/employee";
-  }
 }

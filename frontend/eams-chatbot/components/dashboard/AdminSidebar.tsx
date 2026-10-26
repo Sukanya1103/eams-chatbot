@@ -11,7 +11,14 @@ const LINKS = [
   { href: "/admin/chatbot", label: "Assistant", icon: "chat" },
 ] as const;
 
-export default function AdminSidebar({ collapsed, onToggle, onClose, onNavigate }: SidebarCollapseProps & { onNavigate?: () => void }) {
+export default function AdminSidebar({
+  collapsed,
+  onToggle,
+  onClose,
+  onNavigate,
+}: SidebarCollapseProps & {
+  onNavigate?: () => void;
+}) {
   return (
     <nav aria-label="Admin navigation" className={`flex h-full flex-col justify-between overflow-y-auto ${collapsed ? "p-3" : "p-4"}`}>
       <div>

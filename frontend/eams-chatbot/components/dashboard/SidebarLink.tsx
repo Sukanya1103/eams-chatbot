@@ -14,16 +14,18 @@ export default function SidebarLink({
   icon,
   collapsed = false,
   onNavigate,
+  active,
 }: {
   href: string;
   label: string;
   icon?: SidebarIconName;
   collapsed?: boolean;
   onNavigate?: () => void;
+  active?: boolean;
 }) {
   const pathname = usePathname();
   const isRootDashboard = /^\/(admin|hr|manager|employee)$/.test(href);
-  const isActive = isRootDashboard ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
+  const isActive = active ?? (isRootDashboard ? pathname === href : pathname === href || pathname.startsWith(`${href}/`));
 
   return (
     <Link

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import SidebarLink from "./SidebarLink";
 import SidebarHeader, { type SidebarCollapseProps } from "./SidebarHeader";
+import { MANAGER_SECTIONS, useManagerNavigation } from "./ManagerNavigationContext";
 
 type WorkspaceRole = "HR" | "MANAGER";
 
@@ -42,9 +43,14 @@ export default function RoleWorkspaceSidebar({
   onToggle,
   onClose,
   onNavigate,
-}: { role: WorkspaceRole; onNavigate?: () => void } & SidebarCollapseProps) {
+}: {
+  role: WorkspaceRole;
+  onNavigate?: () => void;
+} & SidebarCollapseProps) {
   const pathname = usePathname();
+  const managerNavigation = useManagerNavigation();
   const isSelfWorkspace = pathname.startsWith("/employee");
+  const isManagerWorkspace = role === "MANAGER" && !isSelfWorkspace;
   const config = ROLE_CONFIG[role];
   const destination = isSelfWorkspace ? config.roleHome : "/employee";
   const links = isSelfWorkspace ? SELF_LINKS : config.roleLinks;
@@ -71,7 +77,28 @@ export default function RoleWorkspaceSidebar({
           {!collapsed && <span className="rounded-lg bg-white/15 px-2 py-1 text-xs font-semibold text-white">Switch</span>}
         </Link>
 
-        {links.map((link) => <SidebarLink key={link.href} {...link} collapsed={collapsed} onNavigate={onNavigate} />)}
+        {isManagerWorkspace ? (
+          <>
+            {MANAGER_SECTIONS.map((link) => (
+              <SidebarLink
+                key={link.name}
+                href="/manager"
+                label={link.name}
+                icon={link.icon}
+                collapsed={collapsed}
+                active={pathname === "/manager" && managerNavigation.section === link.name}
+                onNavigate={() => {
+                  managerNavigation.setSection(link.name);
+                  onNavigate?.();
+                }}
+              />
+            ))}
+            <SidebarLink href="/manager/team-attendance" label="Team attendance" icon="attendance" collapsed={collapsed} onNavigate={onNavigate} />
+            <SidebarLink href="/manager/team-leaves" label="Team leave approvals" icon="leave" collapsed={collapsed} onNavigate={onNavigate} />
+          </>
+        ) : (
+          links.map((link) => <SidebarLink key={link.href} {...link} collapsed={collapsed} onNavigate={onNavigate} />)
+        )}
       </div>
     </nav>
   );
