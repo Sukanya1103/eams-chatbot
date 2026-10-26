@@ -11,10 +11,10 @@ export default async function AdminEmployeesPage() {
 
   return (
     <div>
-      <div className="flex flex-col gap-4 rounded-3xl border border-white/85 bg-white/55 p-6 shadow-lg shadow-indigo-950/[0.05] backdrop-blur-2xl sm:flex-row sm:items-center sm:justify-between sm:p-8">
+      <div className="flex flex-col gap-4 rounded-3xl border border-slate-200 bg-white p-6 shadow-lg shadow-blue-950/[0.05] backdrop-blur-2xl sm:flex-row sm:items-center sm:justify-between sm:p-8">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-violet-700">Admin workspace</p>
-          <h1 className="mt-2 text-2xl font-black tracking-tight text-[#202944]">All employees</h1>
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3B82F6]">Admin workspace</p>
+          <h1 className="mt-2 text-2xl font-black tracking-tight text-[#1F2937]">All employees</h1>
           <p className="mt-1 text-sm text-slate-600">
             {employees.length} {employees.length === 1 ? "employee" : "employees"} across the company.
           </p>

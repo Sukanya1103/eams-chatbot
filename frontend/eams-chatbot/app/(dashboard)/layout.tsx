@@ -28,7 +28,7 @@ export default async function DashboardLayout({
 
   return (
     <>
-      <DashboardShell role={user.role} employeeName={user.role === "EMPLOYEE" ? employeeDisplayName(user.name) ?? undefined : undefined}>{children}</DashboardShell>
+      <DashboardShell role={user.role} userName={employeeDisplayName(user.name) ?? undefined} email={user.email}>{children}</DashboardShell>
       <ChatLauncher />
     </>
   );

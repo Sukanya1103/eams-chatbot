@@ -10,9 +10,9 @@ export default async function AdminAttendancePage() {
   const missingCheckOut = todayRecords.filter((record) => record.status === "PRESENT" && !record.checkOut).length;
 
   return <div className="mx-auto max-w-7xl">
-    <header className="rounded-3xl border border-white/85 bg-white/55 p-6 shadow-lg shadow-indigo-950/[0.05] backdrop-blur-2xl sm:p-8">
-      <p className="text-xs font-bold uppercase tracking-[0.16em] text-violet-700">Admin workspace</p>
-      <h1 className="mt-2 text-2xl font-black tracking-tight text-[#202944] sm:text-3xl">Attendance management</h1>
+    <header className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg shadow-blue-950/[0.05] backdrop-blur-2xl sm:p-8">
+      <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3B82F6]">Admin workspace</p>
+      <h1 className="mt-2 text-2xl font-black tracking-tight text-[#1F2937] sm:text-3xl">Attendance management</h1>
       <p className="mt-2 text-sm text-slate-600">Review submitted attendance records and find missing check-outs.</p>
     </header>
     <section className="mt-5 grid gap-3 sm:grid-cols-3">
@@ -26,5 +26,5 @@ export default async function AdminAttendancePage() {
 }
 
 function Summary({ label, value }: { label: string; value: number }) {
-  return <article className="rounded-2xl border border-white/85 bg-white/55 p-4 shadow-sm shadow-indigo-950/[0.04] backdrop-blur-xl"><p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p><p className="mt-2 text-2xl font-black text-[#202944]">{value}</p></article>;
+  return <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm shadow-blue-950/[0.04] backdrop-blur-xl"><p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p><p className="mt-2 text-2xl font-black text-[#1F2937]">{value}</p></article>;
 }

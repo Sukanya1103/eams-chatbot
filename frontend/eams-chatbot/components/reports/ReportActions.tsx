@@ -18,7 +18,7 @@ export default function ReportActions({ records }: { records: AttendanceResponse
   }
 
   return <div className="flex flex-wrap gap-2 print:hidden">
-    <button type="button" onClick={exportCsv} className="rounded-xl border border-violet-200 bg-white/60 px-4 py-2 text-sm font-semibold text-violet-800 transition hover:bg-violet-50">Export attendance CSV</button>
+    <button type="button" onClick={exportCsv} className="rounded-xl border border-blue-200 bg-white px-4 py-2 text-sm font-semibold text-[#24445F] transition hover:bg-blue-50">Export attendance CSV</button>
     <button type="button" onClick={() => window.print()} className="rounded-xl border border-slate-200 bg-white/60 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-white">Print report</button>
   </div>;
 }

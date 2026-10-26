@@ -1,4 +1,4 @@
-package com.eams.eams_chatbot.enums.eams_chatbot.security;
+package com.eams.eams_chatbot.security;
 
 import com.eams.eams_chatbot.model.User;
 import com.eams.eams_chatbot.repository.UserRepository;

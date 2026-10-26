@@ -30,9 +30,9 @@ export default function AttendanceTable({
   }
 
   return (
-    <div className={`${employeeTheme ? "overflow-x-auto" : "overflow-hidden"} rounded-lg border ${employeeTheme ? "border-slate-700" : "border-slate-200"}`}>
+    <div className={`${employeeTheme ? "overflow-x-auto" : "overflow-hidden"} rounded-lg border ${employeeTheme ? "border-slate-200" : "border-slate-200"}`}>
       <table className={`w-full text-sm ${employeeTheme ? "min-w-[680px]" : ""}`}>
-        <thead className={`${employeeTheme ? "bg-[#252b34] text-slate-300" : "bg-slate-50 text-slate-500"} text-left text-xs font-semibold uppercase tracking-wide`}>
+        <thead className={`${employeeTheme ? "bg-[#F4F7FA] text-slate-600" : "bg-slate-50 text-slate-500"} text-left text-xs font-semibold uppercase tracking-wide`}>
           <tr>
             {showEmployeeName && <th className="px-4 py-3">Employee</th>}
             <th className="px-4 py-3">Date</th>
@@ -41,17 +41,17 @@ export default function AttendanceTable({
             <th className="px-4 py-3">Status</th>
           </tr>
         </thead>
-        <tbody className={`divide-y ${employeeTheme ? "divide-slate-700 text-slate-200" : "divide-slate-100"}`}>
+        <tbody className={`divide-y ${employeeTheme ? "divide-slate-200 text-slate-700" : "divide-slate-100"}`}>
           {records.map((r) => (
-            <tr key={r.attendanceId} className={employeeTheme ? "hover:bg-slate-800/60" : "hover:bg-slate-50"}>
+            <tr key={r.attendanceId} className={employeeTheme ? "hover:bg-slate-100/60" : "hover:bg-slate-50"}>
               {showEmployeeName && (
-                <td className={`px-4 py-3 font-medium ${employeeTheme ? "text-slate-100" : "text-slate-900"}`}>{r.employeeName}</td>
+                <td className={`px-4 py-3 font-medium ${employeeTheme ? "text-[#1F2937]" : "text-slate-900"}`}>{r.employeeName}</td>
               )}
-              <td className={`px-4 py-3 font-medium ${employeeTheme ? "text-slate-100" : "text-slate-900"}`}>{r.date}</td>
-              <td className={`px-4 py-3 ${employeeTheme ? "text-slate-300" : "text-slate-600"}`}>
+              <td className={`px-4 py-3 font-medium ${employeeTheme ? "text-[#1F2937]" : "text-slate-900"}`}>{r.date}</td>
+              <td className={`px-4 py-3 ${employeeTheme ? "text-slate-600" : "text-slate-600"}`}>
                 {r.checkIn ? new Date(r.checkIn).toLocaleTimeString() : "—"}
               </td>
-              <td className={`px-4 py-3 ${employeeTheme ? "text-slate-300" : "text-slate-600"}`}>
+              <td className={`px-4 py-3 ${employeeTheme ? "text-slate-600" : "text-slate-600"}`}>
                 {r.checkOut ? new Date(r.checkOut).toLocaleTimeString() : "—"}
               </td>
               <td className="px-4 py-3">

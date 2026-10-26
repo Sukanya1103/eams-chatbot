@@ -39,3 +39,21 @@ export interface EmployeeSummary {
   managerId?: string;
   dateOfJoining?: string;
 }
+
+export interface MyProfile {
+  employeeId: string;
+  name: string;
+  email: string;
+  role: Role;
+  designation?: string;
+  department?: string;
+  managerId?: string;
+  dateOfJoining?: string;
+  dateOfBirth?: string;
+  contactNumber?: string;
+}
+
+export interface UpdateMyProfileRequest {
+  dateOfBirth: string | null;
+  contactNumber: string;
+}

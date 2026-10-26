@@ -43,13 +43,13 @@ export default async function AdminOverviewPage() {
   });
   return (
     <div className="mx-auto max-w-7xl">
-      <header className="relative overflow-hidden rounded-3xl border border-white/85 bg-white/55 px-6 py-7 shadow-xl shadow-indigo-950/[0.06] backdrop-blur-2xl sm:px-8">
-        <div aria-hidden="true" className="pointer-events-none absolute -right-12 -top-24 h-64 w-64 rounded-full bg-violet-300/25 blur-3xl" />
+      <header className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white px-6 py-7 shadow-xl shadow-blue-950/[0.06] backdrop-blur-2xl sm:px-8">
+        <div aria-hidden="true" className="pointer-events-none absolute -right-12 -top-24 h-64 w-64 rounded-full bg-blue-100/70 blur-3xl" />
         <div className="relative">
-          <p className="inline-flex items-center gap-2 rounded-full border border-violet-200/80 bg-violet-50/75 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-violet-700">
-            <span className="h-1.5 w-1.5 rounded-full bg-violet-500" />System administration
+          <p className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-[#3B82F6]">
+            <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />System administration
           </p>
-          <h1 className="mt-4 text-2xl font-black tracking-tight text-[#202944] sm:text-3xl">Welcome back, {user?.name ?? "Admin"}</h1>
+          <h1 className="mt-4 text-2xl font-black tracking-tight text-[#1F2937] sm:text-3xl">Welcome back, {user?.name ?? "Admin"}</h1>
           <p className="mt-2 text-sm text-slate-600">A live view of workforce activity and the operational queue.</p>
         </div>
       </header>
@@ -62,13 +62,13 @@ export default async function AdminOverviewPage() {
       </section>
 
       <section className="mt-6 grid gap-6 xl:grid-cols-5">
-        <article className="rounded-3xl border border-white/85 bg-white/60 p-6 shadow-lg shadow-indigo-950/[0.05] backdrop-blur-xl xl:col-span-3">
+        <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg shadow-blue-950/[0.05] backdrop-blur-xl xl:col-span-3">
           <div className="flex justify-between gap-4">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-violet-700">Attendance activity</p>
-              <h2 className="mt-1 text-lg font-bold text-[#202944]">Recent attendance</h2>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3B82F6]">Attendance activity</p>
+              <h2 className="mt-1 text-lg font-bold text-[#1F2937]">Recent attendance</h2>
             </div>
-            <Link href="/admin/attendance" className="text-sm font-semibold text-violet-700 transition hover:text-violet-900">View all</Link>
+            <Link href="/admin/attendance" className="text-sm font-semibold text-[#3B82F6] transition hover:text-[#24445F]">View all</Link>
           </div>
           {recentAttendance.length ? (
             <div className="mt-5 overflow-x-auto">
@@ -80,14 +80,14 @@ export default async function AdminOverviewPage() {
               </table>
             </div>
           ) : (
-            <p className="mt-5 rounded-2xl border border-white/80 bg-white/60 px-4 py-8 text-center text-sm text-slate-500">No attendance records are available yet.</p>
+            <p className="mt-5 rounded-2xl border border-slate-200 bg-white px-4 py-8 text-center text-sm text-slate-500">No attendance records are available yet.</p>
           )}
         </article>
 
-        <article className="rounded-3xl border border-white/85 bg-white/60 p-6 shadow-lg shadow-indigo-950/[0.05] backdrop-blur-xl xl:col-span-2">
-          <div className="flex items-start justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-violet-700">Weekly trend</p><h2 className="mt-1 text-lg font-bold text-[#202944]">Attendance rate</h2></div><span className="rounded-full bg-violet-50 px-3 py-1 text-sm font-bold text-violet-700">{attendanceRate}% today</span></div>
+        <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg shadow-blue-950/[0.05] backdrop-blur-xl xl:col-span-2">
+          <div className="flex items-start justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3B82F6]">Weekly trend</p><h2 className="mt-1 text-lg font-bold text-[#1F2937]">Attendance rate</h2></div><span className="rounded-full bg-blue-50 px-3 py-1 text-sm font-bold text-[#3B82F6]">{attendanceRate}% today</span></div>
           <div className="mt-6 flex h-36 items-end justify-between gap-2" aria-label="Attendance rate over the last seven days">
-            {trend.map((day) => <div key={day.key} className="flex h-full flex-1 flex-col items-center justify-end gap-2"><span className="text-[10px] font-medium text-slate-500">{day.count ? `${day.rate}%` : "—"}</span><div className="flex h-24 w-full items-end"><div title={`${day.label}: ${day.rate}% of recorded attendance`} className="w-full rounded-t-lg bg-gradient-to-t from-violet-500 to-indigo-400" style={{ height: `${day.count ? Math.max(day.rate, 8) : 4}%` }} /></div><span className="text-[10px] font-semibold text-slate-500">{day.label}</span></div>)}
+            {trend.map((day) => <div key={day.key} className="flex h-full flex-1 flex-col items-center justify-end gap-2"><span className="text-[10px] font-medium text-slate-500">{day.count ? `${day.rate}%` : "—"}</span><div className="flex h-24 w-full items-end"><div title={`${day.label}: ${day.rate}% of recorded attendance`} className="w-full rounded-t-lg bg-gradient-to-t from-[#3B82F6] to-[#24445F]" style={{ height: `${day.count ? Math.max(day.rate, 8) : 4}%` }} /></div><span className="text-[10px] font-semibold text-slate-500">{day.label}</span></div>)}
           </div>
           <p className="mt-3 text-xs text-slate-500">Calculated from attendance records submitted each day.</p>
         </article>
@@ -103,9 +103,9 @@ export default async function AdminOverviewPage() {
 }
 function Metric({ label, value, detail }: { label: string; value: number; detail: string }) {
   return (
-    <article className="rounded-3xl border border-white/85 bg-white/60 p-5 shadow-lg shadow-indigo-950/[0.05] backdrop-blur-xl transition duration-200 hover:-translate-y-1 hover:bg-white/80">
+    <article className="rounded-3xl border border-slate-200 bg-white p-5 shadow-lg shadow-blue-950/[0.05] backdrop-blur-xl transition duration-200 hover:-translate-y-1 hover:bg-white/80">
       <p className="text-sm font-medium text-slate-500">{label}</p>
-      <p className="mt-4 text-3xl font-black tracking-tight text-[#202944]">{value}</p>
+      <p className="mt-4 text-3xl font-black tracking-tight text-[#1F2937]">{value}</p>
       <p className="mt-1 text-xs text-slate-500">{detail}</p>
     </article>
   );
@@ -113,7 +113,7 @@ function Metric({ label, value, detail }: { label: string; value: number; detail
 
 function Action({ href, title, copy }: { href: string; title: string; copy: string }) {
   return (
-    <Link href={href} className="rounded-2xl border border-white/90 bg-white/45 px-4 py-4 transition hover:-translate-y-0.5 hover:border-violet-200 hover:bg-violet-50/70 hover:shadow-md hover:shadow-violet-950/5">
+    <Link href={href} className="rounded-2xl border border-slate-200 bg-white px-4 py-4 transition hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50 hover:shadow-md hover:shadow-blue-950/5">
       <p className="text-sm font-bold text-slate-800">{title}</p>
       <p className="mt-1 text-xs text-slate-500">{copy}</p>
     </Link>
@@ -122,10 +122,10 @@ function Action({ href, title, copy }: { href: string; title: string; copy: stri
 
 function StatusPill({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    PRESENT: "bg-emerald-50 text-emerald-700",
-    ABSENT: "bg-rose-50 text-rose-700",
-    HALF_DAY: "bg-amber-50 text-amber-700",
-    WFH: "bg-sky-50 text-sky-700",
+    PRESENT: "bg-green-50 text-[#16A34A]",
+    ABSENT: "bg-red-50 text-[#DC2626]",
+    HALF_DAY: "bg-amber-50 text-[#D97706]",
+    WFH: "bg-blue-50 text-[#24445F]",
   };
   return <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${styles[status] ?? "bg-slate-100 text-slate-600"}`}>{status.replace("_", " ")}</span>;
 }

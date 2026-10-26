@@ -30,22 +30,22 @@ export default function CheckInOutCard({ today, dataAvailable = true }: { today:
     finally { setIsSubmitting(false); }
   }
 
-  return <div className="min-w-64 rounded-xl border border-slate-700 bg-[#20252d] p-4 text-white shadow-lg">
-    <h2 className="text-xs font-bold uppercase tracking-wide text-slate-400">Current status</h2>
-    {!dataAvailable ? <p className="mt-2 text-sm text-amber-200">Attendance data is unavailable. Actions are disabled until it loads.</p> : <>
-      <p className="mt-1 text-sm text-slate-300">{!sessions.length ? "You haven’t checked in yet." : active ? "You have an active attendance session." : "All attendance sessions are checked out."}</p>
+  return <div className="min-w-64 rounded-xl border border-slate-200 bg-white p-4 text-[#1F2937] shadow-lg">
+    <h2 className="text-xs font-bold uppercase tracking-wide text-[#64748B]">Current status</h2>
+    {!dataAvailable ? <p className="mt-2 text-sm text-[#D97706]">Attendance data is unavailable. Actions are disabled until it loads.</p> : <>
+      <p className="mt-1 text-sm text-slate-600">{!sessions.length ? "You haven’t checked in yet." : active ? "You have an active attendance session." : "All attendance sessions are checked out."}</p>
       {active ? <button onClick={() => act("check-out")} disabled={isSubmitting} className={buttonClass}>{isSubmitting ? "Checking out…" : "Check out"}</button>
         : <button onClick={() => act("check-in")} disabled={isSubmitting} className={buttonClass}>{isSubmitting ? "Checking in…" : sessions.length ? "Check in again" : "Check in"}</button>}
       {sessions.length > 0 && <div className="mt-4 space-y-2.5">
-        <div className="flex justify-between text-xs"><span className="text-slate-400">Total time worked</span><span className="font-semibold text-slate-100">{formatDuration(workedSeconds)}</span></div>
-        <div role="progressbar" aria-label="Eight-hour shift progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress} className="h-2 overflow-hidden rounded-full bg-slate-700"><div className="h-full rounded-full bg-gradient-to-r from-blue-600 to-cyan-400 transition-[width] duration-500" style={{ width: `${progress}%` }} /></div>
-        <ul className="space-y-1.5 text-xs text-slate-300">{sessions.map((session, index) => <li key={session.sessionId} className="flex justify-between gap-2"><span>Session {index + 1}: {formatTime(session.checkIn)} – {session.checkOut ? formatTime(session.checkOut) : "Active"}</span><span>{formatDuration(Math.max(0, (Date.parse(session.checkOut ?? new Date(now).toISOString()) - Date.parse(session.checkIn)) / 1000))}</span></li>)}</ul>
+        <div className="flex justify-between text-xs"><span className="text-[#64748B]">Total time worked</span><span className="font-semibold text-[#1F2937]">{formatDuration(workedSeconds)}</span></div>
+        <div role="progressbar" aria-label="Eight-hour shift progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress} className="h-2 overflow-hidden rounded-full bg-slate-200"><div className="h-full rounded-full bg-[#3B82F6] transition-[width] duration-500" style={{ width: `${progress}%` }} /></div>
+        <ul className="space-y-1.5 text-xs text-slate-600">{sessions.map((session, index) => <li key={session.sessionId} className="flex justify-between gap-2"><span>Session {index + 1}: {formatTime(session.checkIn)} – {session.checkOut ? formatTime(session.checkOut) : "Active"}</span><span>{formatDuration(Math.max(0, (Date.parse(session.checkOut ?? new Date(now).toISOString()) - Date.parse(session.checkIn)) / 1000))}</span></li>)}</ul>
       </div>}
     </>}
-    {error && <p role="alert" className="mt-3 text-sm text-red-300">{error}</p>}
+    {error && <p role="alert" className="mt-3 text-sm text-[#DC2626]">{error}</p>}
   </div>;
 }
 
-const buttonClass = "mt-3 w-full rounded-lg bg-gradient-to-r from-blue-600 to-cyan-500 px-4 py-2.5 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300";
+const buttonClass = "mt-3 w-full rounded-lg bg-[#3B82F6] px-4 py-2.5 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400";
 function formatDuration(seconds: number) { const value = Math.floor(seconds); return `${Math.floor(value / 3600)}h ${Math.floor((value % 3600) / 60)}m ${value % 60}s`; }
 function formatTime(value: string) { return new Intl.DateTimeFormat("en-IN", { hour: "numeric", minute: "2-digit", second: "2-digit", timeZone: "Asia/Kolkata" }).format(new Date(value)); }
