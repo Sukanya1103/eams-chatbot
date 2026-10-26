@@ -15,22 +15,24 @@ const STATUS_STYLES: Record<string, string> = {
 export default function AttendanceTable({
   records,
   showEmployeeName = false,
+  employeeTheme = false,
 }: {
   records: AttendanceResponse[];
   showEmployeeName?: boolean;
+  employeeTheme?: boolean;
 }) {
   if (records.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-slate-300 p-8 text-center text-sm text-slate-500">
+      <div className={`rounded-lg border border-dashed p-8 text-center text-sm ${employeeTheme ? "border-slate-400 text-slate-500" : "border-slate-300 text-slate-500"}`}>
         No attendance records yet.
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-slate-200">
-      <table className="w-full text-sm">
-        <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+    <div className={`${employeeTheme ? "overflow-x-auto" : "overflow-hidden"} rounded-lg border ${employeeTheme ? "border-slate-700" : "border-slate-200"}`}>
+      <table className={`w-full text-sm ${employeeTheme ? "min-w-[680px]" : ""}`}>
+        <thead className={`${employeeTheme ? "bg-[#252b34] text-slate-300" : "bg-slate-50 text-slate-500"} text-left text-xs font-semibold uppercase tracking-wide`}>
           <tr>
             {showEmployeeName && <th className="px-4 py-3">Employee</th>}
             <th className="px-4 py-3">Date</th>
@@ -39,17 +41,17 @@ export default function AttendanceTable({
             <th className="px-4 py-3">Status</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-100">
+        <tbody className={`divide-y ${employeeTheme ? "divide-slate-700 text-slate-200" : "divide-slate-100"}`}>
           {records.map((r) => (
-            <tr key={r.attendanceId} className="hover:bg-slate-50">
+            <tr key={r.attendanceId} className={employeeTheme ? "hover:bg-slate-800/60" : "hover:bg-slate-50"}>
               {showEmployeeName && (
-                <td className="px-4 py-3 font-medium text-slate-900">{r.employeeName}</td>
+                <td className={`px-4 py-3 font-medium ${employeeTheme ? "text-slate-100" : "text-slate-900"}`}>{r.employeeName}</td>
               )}
-              <td className="px-4 py-3 font-medium text-slate-900">{r.date}</td>
-              <td className="px-4 py-3 text-slate-600">
+              <td className={`px-4 py-3 font-medium ${employeeTheme ? "text-slate-100" : "text-slate-900"}`}>{r.date}</td>
+              <td className={`px-4 py-3 ${employeeTheme ? "text-slate-300" : "text-slate-600"}`}>
                 {r.checkIn ? new Date(r.checkIn).toLocaleTimeString() : "—"}
               </td>
-              <td className="px-4 py-3 text-slate-600">
+              <td className={`px-4 py-3 ${employeeTheme ? "text-slate-300" : "text-slate-600"}`}>
                 {r.checkOut ? new Date(r.checkOut).toLocaleTimeString() : "—"}
               </td>
               <td className="px-4 py-3">
