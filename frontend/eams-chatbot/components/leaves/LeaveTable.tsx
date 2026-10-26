@@ -21,10 +21,12 @@ export default function LeaveTable({
   leaves,
   readOnly = false,
   showEmployeeName = true,
+  employeeTheme = false,
 }: {
   leaves: LeaveResponse[];
   readOnly?: boolean;
   showEmployeeName?: boolean;
+  employeeTheme?: boolean;
 }) {
   const router = useRouter();
   const [pendingActionId, setPendingActionId] = useState<string | null>(null);
@@ -51,16 +53,16 @@ export default function LeaveTable({
 
   if (leaves.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-slate-300 p-8 text-center text-sm text-slate-500">
+      <div className={`rounded-xl border border-dashed p-8 text-center text-sm ${employeeTheme ? "border-slate-400 bg-white/60 text-slate-600" : "border-slate-300 text-slate-500"}`}>
         No leave requests to show.
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-slate-200">
-      <table className="w-full text-sm">
-        <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+    <div className={`${employeeTheme ? "overflow-x-auto rounded-xl" : "overflow-hidden rounded-lg"} border ${employeeTheme ? "border-slate-700 bg-[#171b22]" : "border-slate-200"}`}>
+      <table className={`w-full text-sm ${employeeTheme ? "min-w-[760px]" : ""}`}>
+        <thead className={`${employeeTheme ? "bg-[#252b34] text-slate-300" : "bg-slate-50 text-slate-500"} text-left text-xs font-semibold uppercase tracking-wide`}>
           <tr>
             {showEmployeeName && <th className="px-4 py-3">Employee</th>}
             <th className="px-4 py-3">Type</th>
@@ -70,15 +72,15 @@ export default function LeaveTable({
             <th className="px-4 py-3"></th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-100">
+        <tbody className={`divide-y ${employeeTheme ? "divide-slate-700 text-slate-200" : "divide-slate-100"}`}>
           {leaves.map((leave) => (
-            <tr key={leave.leaveId} className="hover:bg-slate-50">
-              {showEmployeeName && <td className="px-4 py-3 font-medium text-slate-900">{leave.employeeName}</td>}
-              <td className="px-4 py-3 text-slate-600">{leave.type}</td>
-              <td className="px-4 py-3 text-slate-600">
+            <tr key={leave.leaveId} className={employeeTheme ? "hover:bg-slate-800/60" : "hover:bg-slate-50"}>
+              {showEmployeeName && <td className={`px-4 py-3 font-medium ${employeeTheme ? "text-slate-100" : "text-slate-900"}`}>{leave.employeeName}</td>}
+              <td className={`px-4 py-3 ${employeeTheme ? "text-slate-300" : "text-slate-600"}`}>{leave.type}</td>
+              <td className={`px-4 py-3 ${employeeTheme ? "text-slate-300" : "text-slate-600"}`}>
                 {leave.startDate} → {leave.endDate}
               </td>
-              <td className="px-4 py-3 text-slate-600">{leave.reason}</td>
+              <td className={`px-4 py-3 ${employeeTheme ? "text-slate-300" : "text-slate-600"}`}>{leave.reason}</td>
               <td className="px-4 py-3">
                 <span
                   className={`rounded-full px-2 py-1 text-xs font-medium ${STATUS_STYLES[leave.status]}`}

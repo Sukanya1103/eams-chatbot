@@ -6,6 +6,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
@@ -32,6 +33,11 @@ public class GlobalExceptionHandler {
                 .orElse("Invalid request");
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody(message));
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> handleUnreadableRequest(HttpMessageNotReadableException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody("Invalid request body or field value"));
     }
 
     @ExceptionHandler(ResponseStatusException.class)
