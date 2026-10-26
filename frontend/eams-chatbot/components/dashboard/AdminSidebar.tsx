@@ -6,7 +6,10 @@ import SidebarHeader, { type SidebarCollapseProps } from "./SidebarHeader";
 const LINKS = [
   { href: "/admin", label: "Overview" },
   { href: "/admin/employees", label: "Employees" },
+  { href: "/admin/attendance", label: "Attendance" },
+  { href: "/admin/leaves", label: "Leave requests" },
   { href: "/admin/reports", label: "Reports" },
+  { href: "/admin/chatbot", label: "Assistant" },
 ];
 
 export default function AdminSidebar({ collapsed, onToggle }: SidebarCollapseProps) {

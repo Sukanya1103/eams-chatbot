@@ -23,11 +23,21 @@ export default function DashboardShell({
 
   const isEmployee = role === "EMPLOYEE";
 
+  const isAdmin = role === "ADMIN";
+
   return (
-    <div className="flex min-h-screen bg-cyan-50">
+    <div
+      className={`flex min-h-screen ${
+        isAdmin
+          ? "bg-[radial-gradient(ellipse_at_8%_0%,rgba(139,121,255,0.16),transparent_34%),radial-gradient(ellipse_at_92%_86%,rgba(113,145,224,0.12),transparent_34%),linear-gradient(135deg,#f5f5fb_0%,#eef1f8_52%,#f5f3fa_100%)]"
+          : "bg-cyan-50"
+      }`}
+    >
       {isEmployee && mobileOpen && <button aria-label="Close navigation menu" onClick={() => setMobileOpen(false)} className="fixed inset-0 z-40 bg-slate-950/40 md:hidden" />}
       <aside
-        className={`${isEmployee ? `fixed inset-y-0 left-0 z-50 w-72 md:sticky md:top-0 md:z-auto md:h-screen ${collapsed ? "md:w-20" : "md:w-72"} ${mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}` : "shrink-0"} ${isEmployee ? "bg-[#121820] shadow-xl shadow-slate-950/15" : "bg-cyan-700 shadow-xl shadow-cyan-950/15"} transition-[width,transform] duration-200 ${!isEmployee ? (collapsed ? "w-20" : "w-72") : ""}`}
+        className={`shrink-0 bg-cyan-700 shadow-xl shadow-cyan-950/15 transition-[width] duration-200 ${
+          collapsed ? "w-20" : "w-72"
+        }`}
       >
         {role === "ADMIN" ? (
           <AdminSidebar collapsed={collapsed} onToggle={toggleCollapsed} />

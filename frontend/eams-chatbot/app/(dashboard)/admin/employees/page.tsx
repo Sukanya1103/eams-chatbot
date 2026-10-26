@@ -3,6 +3,7 @@
 // via lib/server/employees.ts, no client-side loading state needed.
 
 import { getEmployees } from "@/lib/server/employees";
+import EmployeeDirectory from "@/components/employees/EmployeeDirectory";
 import RegisterEmployeeModal from "@/components/employees/RegisterEmployeeModal";
 
 export default async function AdminEmployeesPage() {
@@ -10,47 +11,17 @@ export default async function AdminEmployeesPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 rounded-3xl border border-white/85 bg-white/55 p-6 shadow-lg shadow-indigo-950/[0.05] backdrop-blur-2xl sm:flex-row sm:items-center sm:justify-between sm:p-8">
         <div>
-          <h1 className="text-xl font-semibold text-slate-900">All employees</h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-violet-700">Admin workspace</p>
+          <h1 className="mt-2 text-2xl font-black tracking-tight text-[#202944]">All employees</h1>
+          <p className="mt-1 text-sm text-slate-600">
             {employees.length} {employees.length === 1 ? "employee" : "employees"} across the company.
           </p>
         </div>
-        <RegisterEmployeeModal />
+        <div className="flex flex-wrap items-center gap-3"><RegisterEmployeeModal /><span className="text-xs text-slate-500">Create employee, manager, or HR accounts</span></div>
       </div>
-
-      {employees.length === 0 ? (
-        <div className="mt-8 rounded-lg border border-dashed border-slate-300 p-8 text-center text-sm text-slate-500">
-          No employees yet. Once the backend&apos;s employee list endpoint is
-          connected, or after registering someone, they&apos;ll show up here.
-        </div>
-      ) : (
-        <div className="mt-6 overflow-hidden rounded-lg border border-slate-200">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-              <tr>
-                <th className="px-4 py-3">Name</th>
-                <th className="px-4 py-3">Email</th>
-                <th className="px-4 py-3">Role</th>
-                <th className="px-4 py-3">Department</th>
-                <th className="px-4 py-3">Designation</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {employees.map((emp) => (
-                <tr key={emp.employeeId} className="hover:bg-slate-50">
-                  <td className="px-4 py-3 font-medium text-slate-900">{emp.name}</td>
-                  <td className="px-4 py-3 text-slate-600">{emp.email}</td>
-                  <td className="px-4 py-3 text-slate-600">{emp.role}</td>
-                  <td className="px-4 py-3 text-slate-600">{emp.department}</td>
-                  <td className="px-4 py-3 text-slate-600">{emp.designation}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <EmployeeDirectory employees={employees} />
     </div>
   );
 }
