@@ -33,24 +33,12 @@ export default function EmployeeSidebar({
         <ul className="space-y-1">
           {ITEMS.map((item) => {
             const href = item.href;
-            const active = href === "/employee" ? pathname === href : href ? pathname.startsWith(href) : false;
+            const active = href === "/employee" ? pathname === href : pathname.startsWith(href);
             const content = <><SidebarIcon name={item.icon} /><span className={collapsed ? "sr-only" : "truncate"}>{item.label}</span></>;
             return <li key={item.label}>
-<<<<<<< HEAD
-              {href ? (
-                <Link href={href} onClick={onNavigate} aria-current={active ? "page" : undefined} aria-label={collapsed ? item.label : undefined} title={collapsed ? item.label : undefined} className={`flex min-h-10 items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300 ${collapsed ? "justify-center" : ""} ${active ? "bg-[#3B82F6] text-white shadow-sm" : "text-slate-100 hover:bg-white/10 hover:text-white"}`}>
-                  {content}
-                </Link>
-              ) : (
-                <div aria-disabled="true" title={`${item.label} employee page is not available`} className={`flex min-h-10 cursor-not-allowed items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-slate-400 ${collapsed ? "justify-center" : ""}`}>
-                  {content}
-                </div>
-              )}
-=======
               <Link href={href} onClick={onNavigate} aria-current={active ? "page" : undefined} aria-label={collapsed ? item.label : undefined} title={collapsed ? item.label : undefined} className={`flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300 ${collapsed ? "justify-center" : ""} ${active ? "bg-[#3B82F6] text-white shadow-sm" : "text-slate-100 hover:bg-white/10 hover:text-white"}`}>
                 {content}
               </Link>
->>>>>>> origin/feature/manager
             </li>;
           })}
         </ul>
