@@ -41,8 +41,8 @@ export interface EmployeeSummary {
 }
 
 export interface MyProfile {
-  employeeId: string;
-  name: string;
+  employeeId?: string;
+  name?: string | null;
   email: string;
   role: Role;
   designation?: string;
@@ -54,6 +54,7 @@ export interface MyProfile {
 }
 
 export interface UpdateMyProfileRequest {
+  name: string;
   dateOfBirth: string | null;
   contactNumber: string;
 }

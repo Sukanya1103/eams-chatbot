@@ -3,14 +3,18 @@ import { getCurrentUser } from "@/lib/auth/getCurrentUser";
 import { getEmployees } from "@/lib/server/employees";
 import { getAttendance } from "@/lib/server/attendance";
 import { getLeaves } from "@/lib/server/leaves";
+import { getMyProfile } from "@/lib/server/profile";
+import { employeeDisplayName } from "../employee/employeeName";
 
 export default async function AdminOverviewPage() {
-  const [user, employees, attendance, leaves] = await Promise.all([
+  const [user, profile, employees, attendance, leaves] = await Promise.all([
     getCurrentUser(),
+    getMyProfile(),
     getEmployees(),
     getAttendance(),
     getLeaves(),
   ]);
+  const displayName = employeeDisplayName(profile?.name) ?? employeeDisplayName(user?.name) ?? "Admin";
   const today = new Date().toISOString().slice(0, 10);
   const todayRecords = attendance.filter((record) => record.date === today);
   const presentToday = todayRecords.filter((record) => record.status === "PRESENT").length;
@@ -49,7 +53,7 @@ export default async function AdminOverviewPage() {
           <p className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-[#3B82F6]">
             <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />System administration
           </p>
-          <h1 className="mt-4 text-2xl font-black tracking-tight text-[#1F2937] sm:text-3xl">Welcome back, {user?.name ?? "Admin"}</h1>
+          <h1 className="mt-4 text-2xl font-black tracking-tight text-[#1F2937] sm:text-3xl">Welcome back, {displayName}</h1>
           <p className="mt-2 text-sm text-slate-600">A live view of workforce activity and the operational queue.</p>
         </div>
       </header>

@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import { getMyProfile, updateMyProfile } from "@/lib/api/profile";
 import type { MyProfile } from "@/types/employee";
 import type { Role } from "@/types/user";
 import LogoutButton from "./LogoutButton";
 
 export default function ProfileMenu({ userName, email, role }: { userName: string; email: string; role: Role }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [profile, setProfile] = useState<MyProfile | null>(null);
   const [loading, setLoading] = useState(false);
@@ -16,6 +18,7 @@ export default function ProfileMenu({ userName, email, role }: { userName: strin
   const [saved, setSaved] = useState(false);
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [contactNumber, setContactNumber] = useState("");
+  const [name, setName] = useState("");
   const menuRef = useRef<HTMLDivElement>(null);
   const initials = userName.split(/\s+/).map((part) => part[0]).slice(0, 2).join("").toUpperCase() || role[0];
 
@@ -41,6 +44,7 @@ export default function ProfileMenu({ userName, email, role }: { userName: strin
     try {
       const details = await getMyProfile();
       setProfile(details);
+      setName(details.name ?? "");
       setDateOfBirth(details.dateOfBirth ?? "");
       setContactNumber(details.contactNumber ?? "");
     } catch (error) {
@@ -56,11 +60,13 @@ export default function ProfileMenu({ userName, email, role }: { userName: strin
     setSaveError("");
     setSaved(false);
     try {
-      const updated = await updateMyProfile({ dateOfBirth: dateOfBirth || null, contactNumber });
+      const updated = await updateMyProfile({ name: name.trim(), dateOfBirth: dateOfBirth || null, contactNumber });
       setProfile(updated);
+      setName(updated.name ?? "");
       setDateOfBirth(updated.dateOfBirth ?? "");
       setContactNumber(updated.contactNumber ?? "");
       setSaved(true);
+      router.refresh();
     } catch (error) {
       setSaveError(error instanceof Error ? error.message : "Could not save your changes.");
     } finally {
@@ -98,7 +104,7 @@ export default function ProfileMenu({ userName, email, role }: { userName: strin
         </header>
         <form onSubmit={saveProfile} className="p-5 sm:p-6">
           <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
-            <ReadOnly label="Full name" value={profile.name} />
+            <label className="block text-sm font-medium text-slate-700">Full name<input required maxLength={120} autoComplete="name" value={name} onChange={(event) => setName(event.target.value)} placeholder="Enter your name" className={inputClass} /></label>
             <ReadOnly label="Work email" value={profile.email} />
             <ReadOnly label="Employee ID" value={profile.employeeId} />
             <ReadOnly label="Role" value={roleLabel(profile.role)} />
@@ -110,7 +116,7 @@ export default function ProfileMenu({ userName, email, role }: { userName: strin
           </div>
           {saveError && <p role="alert" className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{saveError}</p>}
           {saved && <p role="status" className="mt-4 rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700">Your profile was updated.</p>}
-          <footer className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-5"><p className="text-xs text-[#64748B]">Your name, role, and work details are managed by your administrator.</p><div className="ml-auto flex gap-3"><button type="button" onClick={() => setProfile(null)} className="rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100">Close</button><button type="submit" disabled={saving} className="rounded-lg bg-[#17324D] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#24445F] disabled:opacity-60">{saving ? "Saving…" : "Save changes"}</button></div></footer>
+          <footer className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-5"><p className="text-xs text-[#64748B]">You can update your name, date of birth, and phone number here.</p><div className="ml-auto flex gap-3"><button type="button" onClick={() => setProfile(null)} className="rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100">Close</button><button type="submit" disabled={saving} className="rounded-lg bg-[#17324D] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#24445F] disabled:opacity-60">{saving ? "Saving…" : "Save changes"}</button></div></footer>
         </form>
       </section>
     </div>}

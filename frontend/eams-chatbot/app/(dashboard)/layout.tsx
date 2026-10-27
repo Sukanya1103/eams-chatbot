@@ -10,6 +10,7 @@ import { decodeSession, AUTH_COOKIE_NAME } from "@/lib/auth/session";
 import ChatLauncher from "@/components/chatbot/ChatLauncher";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import { employeeDisplayName } from "./employee/employeeName";
+import { getMyProfile } from "@/lib/server/profile";
 
 export default async function DashboardLayout({
   children,
@@ -26,9 +27,13 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
+  const profile = await getMyProfile();
+  const fallbackName = user.role === "ADMIN" ? "Admin" : user.role === "HR" ? "HR" : user.role === "MANAGER" ? "Manager" : "Employee";
+  const displayName = employeeDisplayName(profile?.name) ?? employeeDisplayName(user.name) ?? fallbackName;
+
   return (
     <>
-      <DashboardShell role={user.role} userName={employeeDisplayName(user.name) ?? undefined} email={user.email}>{children}</DashboardShell>
+      <DashboardShell role={user.role} userName={displayName} email={user.email}>{children}</DashboardShell>
       <ChatLauncher />
     </>
   );

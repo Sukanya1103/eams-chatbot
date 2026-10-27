@@ -6,8 +6,9 @@
 "use client";
 
 import { Suspense, useState, type FormEvent } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { login } from "@/lib/api/auth";
+import { ROLE_HOME } from "@/types/user";
 
 export default function LoginPage() {
   return <Suspense fallback={<main className="min-h-screen bg-cyan-50" />}><LoginForm /></Suspense>;
@@ -15,8 +16,6 @@ export default function LoginPage() {
 
 function LoginForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,7 +29,7 @@ function LoginForm() {
 
     try {
       const { user } = await login({ email, password });
-      router.push(redirectTo ?? roleHome(user.role));
+      router.replace(ROLE_HOME[user.role]);
       router.refresh();
     } catch {
       setError("That email or password isn't right. Try again.");
@@ -103,15 +102,3 @@ function LoginForm() {
   );
 }
 
-function roleHome(role: string) {
-  switch (role) {
-    case "ADMIN":
-      return "/admin";
-    case "HR":
-      return "/hr";
-    case "MANAGER":
-      return "/manager";
-    default:
-      return "/employee";
-  }
-}
