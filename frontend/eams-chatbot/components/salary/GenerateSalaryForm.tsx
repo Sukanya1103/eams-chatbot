@@ -52,9 +52,9 @@ export default function GenerateSalaryForm() {
 
   return (
     <>
-      <button onClick={() => setOpen(true)} className="rounded-lg bg-cyan-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-cyan-700">Generate payslip</button>
-      {open && <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/45 p-4" role="dialog" aria-modal="true" aria-label="Generate payslip"><form onSubmit={handleSubmit} className="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl border border-cyan-100 bg-white p-6 shadow-2xl">
-      <div className="flex items-start justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-cyan-600">Payroll</p><h2 className="mt-1 text-xl font-bold text-slate-950">Generate payslip</h2></div><button type="button" onClick={() => setOpen(false)} aria-label="Close payslip form" className="rounded-lg px-3 py-1 text-xl text-slate-500 hover:bg-cyan-50">×</button></div>
+      <button onClick={() => setOpen(true)} className="rounded-lg bg-[#3B82F6] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#24445F]">Generate payslip</button>
+      {open && <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/45 p-4" role="dialog" aria-modal="true" aria-label="Generate payslip"><form onSubmit={handleSubmit} className="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl border border-blue-100 bg-white p-6 shadow-2xl">
+      <div className="flex items-start justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3B82F6]">Payroll</p><h2 className="mt-1 text-xl font-bold text-slate-950">Generate payslip</h2></div><button type="button" onClick={() => setOpen(false)} aria-label="Close payslip form" className="rounded-lg px-3 py-1 text-xl text-slate-500 hover:bg-blue-50">×</button></div>
 
       <div className="mt-4 grid grid-cols-2 gap-3">
         <div className="col-span-2">
@@ -128,7 +128,7 @@ export default function GenerateSalaryForm() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="mt-4 w-full rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+        className="mt-4 w-full rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-100 disabled:opacity-50"
       >
         {isSubmitting ? "Generating…" : "Generate payslip"}
       </button>

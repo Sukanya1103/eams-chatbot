@@ -12,7 +12,7 @@ import { approveLeave, rejectLeave } from "@/lib/api/leaves";
 import type { LeaveResponse } from "@/types/leave";
 
 const STATUS_STYLES: Record<string, string> = {
-  PENDING: "bg-amber-50 text-amber-700",
+  PENDING: "bg-amber-50 text-[#D97706]",
   APPROVED: "bg-green-50 text-green-700",
   REJECTED: "bg-red-50 text-red-700",
 };
@@ -60,9 +60,9 @@ export default function LeaveTable({
   }
 
   return (
-    <div className={`${employeeTheme ? "overflow-x-auto rounded-xl" : "overflow-hidden rounded-lg"} border ${employeeTheme ? "border-slate-700 bg-[#171b22]" : "border-slate-200"}`}>
+    <div className={`${employeeTheme ? "overflow-x-auto rounded-xl" : "overflow-hidden rounded-lg"} border ${employeeTheme ? "border-slate-200 bg-white" : "border-slate-200"}`}>
       <table className={`w-full text-sm ${employeeTheme ? "min-w-[760px]" : ""}`}>
-        <thead className={`${employeeTheme ? "bg-[#252b34] text-slate-300" : "bg-slate-50 text-slate-500"} text-left text-xs font-semibold uppercase tracking-wide`}>
+        <thead className={`${employeeTheme ? "bg-[#F4F7FA] text-slate-600" : "bg-slate-50 text-slate-500"} text-left text-xs font-semibold uppercase tracking-wide`}>
           <tr>
             {showEmployeeName && <th className="px-4 py-3">Employee</th>}
             <th className="px-4 py-3">Type</th>
@@ -72,15 +72,15 @@ export default function LeaveTable({
             <th className="px-4 py-3"></th>
           </tr>
         </thead>
-        <tbody className={`divide-y ${employeeTheme ? "divide-slate-700 text-slate-200" : "divide-slate-100"}`}>
+        <tbody className={`divide-y ${employeeTheme ? "divide-slate-200 text-slate-700" : "divide-slate-100"}`}>
           {leaves.map((leave) => (
-            <tr key={leave.leaveId} className={employeeTheme ? "hover:bg-slate-800/60" : "hover:bg-slate-50"}>
-              {showEmployeeName && <td className={`px-4 py-3 font-medium ${employeeTheme ? "text-slate-100" : "text-slate-900"}`}>{leave.employeeName}</td>}
-              <td className={`px-4 py-3 ${employeeTheme ? "text-slate-300" : "text-slate-600"}`}>{leave.type}</td>
-              <td className={`px-4 py-3 ${employeeTheme ? "text-slate-300" : "text-slate-600"}`}>
+            <tr key={leave.leaveId} className={employeeTheme ? "hover:bg-slate-100/60" : "hover:bg-slate-50"}>
+              {showEmployeeName && <td className={`px-4 py-3 font-medium ${employeeTheme ? "text-[#1F2937]" : "text-slate-900"}`}>{leave.employeeName}</td>}
+              <td className={`px-4 py-3 ${employeeTheme ? "text-slate-600" : "text-slate-600"}`}>{leave.type}</td>
+              <td className={`px-4 py-3 ${employeeTheme ? "text-slate-600" : "text-slate-600"}`}>
                 {leave.startDate} → {leave.endDate}
               </td>
-              <td className={`px-4 py-3 ${employeeTheme ? "text-slate-300" : "text-slate-600"}`}>{leave.reason}</td>
+              <td className={`px-4 py-3 ${employeeTheme ? "text-slate-600" : "text-slate-600"}`}>{leave.reason}</td>
               <td className="px-4 py-3">
                 <span
                   className={`rounded-full px-2 py-1 text-xs font-medium ${STATUS_STYLES[leave.status]}`}
@@ -94,7 +94,7 @@ export default function LeaveTable({
                     <button
                       onClick={() => handleApprove(leave.leaveId)}
                       disabled={pendingActionId === leave.leaveId}
-                      className="rounded-md bg-slate-900 px-3 py-1 text-xs font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+                      className="rounded-md bg-[#3B82F6] px-3 py-1 text-xs font-medium text-white hover:bg-[#24445F] disabled:opacity-50"
                     >
                       Approve
                     </button>

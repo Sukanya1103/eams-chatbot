@@ -6,33 +6,42 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import SidebarIcon, { type SidebarIconName } from "./SidebarIcon";
 
 export default function SidebarLink({
   href,
   label,
+  icon,
   collapsed = false,
+  onNavigate,
+  active,
 }: {
   href: string;
   label: string;
+  icon?: SidebarIconName;
   collapsed?: boolean;
+  onNavigate?: () => void;
+  active?: boolean;
 }) {
   const pathname = usePathname();
-  const isActive = pathname === href;
+  const isRootDashboard = /^\/(admin|hr|manager|employee)$/.test(href);
+  const isActive = active ?? (isRootDashboard ? pathname === href : pathname === href || pathname.startsWith(`${href}/`));
 
   return (
     <Link
       href={href}
+      onClick={onNavigate}
       aria-label={label}
+      aria-current={isActive ? "page" : undefined}
       title={collapsed ? label : undefined}
-      className={`block rounded-lg px-3 py-2.5 text-sm font-medium transition ${
-        collapsed ? "text-center" : ""
-      } ${
+      className={`flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300 ${collapsed ? "justify-center" : ""} ${
         isActive
-          ? "bg-white text-cyan-800 shadow-sm"
-          : "text-cyan-50 hover:bg-cyan-600 hover:text-white"
+          ? "bg-[#3B82F6] text-white shadow-sm"
+          : "text-slate-100 hover:bg-white/10 hover:text-white"
       }`}
     >
-      {collapsed ? label.charAt(0).toUpperCase() : label}
+      {icon && <SidebarIcon name={icon} />}
+      <span className={collapsed ? "sr-only" : "truncate"}>{label}</span>
     </Link>
   );
 }

@@ -18,11 +18,11 @@ export default function EmployeePoliciesPage() {
   return <EmployeeFeaturePage title="Company Policies" description="Review workplace guidelines, responsibilities, and employee procedures." emptyTitle="" emptyDescription="">
     <div className="space-y-5">
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {policies.map(([title, description], index) => <article key={title} className="rounded-xl border border-slate-700 bg-[#20252d] p-5">
-          <div className="flex items-start gap-3"><span aria-hidden="true" className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-cyan-900 bg-cyan-950/60 text-sm font-bold text-cyan-300">{String(index + 1).padStart(2, "0")}</span><div><h2 className="font-semibold text-slate-100">{title}</h2><p className="mt-2 text-sm leading-6 text-slate-400">{description}</p></div></div>
+        {policies.map(([title, description], index) => <article key={title} className="rounded-xl border border-slate-200 bg-white p-5">
+          <div className="flex items-start gap-3"><span aria-hidden="true" className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-blue-200 bg-blue-50 text-sm font-bold text-[#3B82F6]">{String(index + 1).padStart(2, "0")}</span><div><h2 className="font-semibold text-[#1F2937]">{title}</h2><p className="mt-2 text-sm leading-6 text-[#64748B]">{description}</p></div></div>
         </article>)}
       </div>
-      <aside className="rounded-xl border border-amber-800/70 bg-amber-950/30 p-4 text-sm leading-6 text-amber-100"><strong>Guidance notice:</strong> These are general workplace guidelines for the project interface. The official HR-approved policy and applicable HR announcements take precedence.</aside>
+      <aside className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-[#D97706]"><strong>Guidance notice:</strong> These are general workplace guidelines for the project interface. The official HR-approved policy and applicable HR announcements take precedence.</aside>
     </div>
   </EmployeeFeaturePage>;
 }

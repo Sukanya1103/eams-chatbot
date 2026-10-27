@@ -1,10 +1,5 @@
-// app/(dashboard)/admin/reports/page.tsx
-// Rather than waiting on a dedicated backend reports endpoint, this derives
-// its stats from the same three list endpoints already built (employees,
-// leaves, attendance). If a real analytics/reports endpoint gets built
-// later, swap the three fetches below for one call — the page shape stays
-// the same.
-
+import Link from "next/link";
+import ReportActions from "@/components/reports/ReportActions";
 import { getEmployees } from "@/lib/server/employees";
 import { getLeaves } from "@/lib/server/leaves";
 import { getAttendance } from "@/lib/server/attendance";
@@ -17,104 +12,64 @@ export default async function AdminReportsPage() {
   ]);
 
   const today = new Date().toISOString().slice(0, 10);
-  const presentToday = attendance.filter((a) => a.date === today && a.status === "PRESENT").length;
-  const pendingLeaves = leaves.filter((l) => l.status === "PENDING").length;
-
-  const byDepartment = employees.reduce<Record<string, number>>((acc, emp) => {
-    acc[emp.department] = (acc[emp.department] ?? 0) + 1;
-    return acc;
+  const month = today.slice(0, 7);
+  const todayRecords = attendance.filter((record) => record.date === today);
+  const monthRecords = attendance.filter((record) => record.date.startsWith(month));
+  const presentToday = todayRecords.filter((record) => record.status === "PRESENT").length;
+  const absentToday = todayRecords.filter((record) => record.status === "ABSENT").length;
+  const attendanceRate = todayRecords.length ? Math.round((presentToday / todayRecords.length) * 100) : 0;
+  const pendingLeaves = leaves.filter((leave) => leave.status === "PENDING").length;
+  const byDepartment = employees.reduce<Record<string, number>>((result, employee) => {
+    const department = employee.department || "Unassigned";
+    result[department] = (result[department] ?? 0) + 1;
+    return result;
   }, {});
-
-  const byRole = employees.reduce<Record<string, number>>((acc, emp) => {
-    acc[emp.role] = (acc[emp.role] ?? 0) + 1;
-    return acc;
+  const byRole = employees.reduce<Record<string, number>>((result, employee) => {
+    result[employee.role] = (result[employee.role] ?? 0) + 1;
+    return result;
   }, {});
-
-  const departmentEntries = Object.entries(byDepartment).sort((a, b) => b[1] - a[1]);
-  const roleEntries = Object.entries(byRole).sort((a, b) => b[1] - a[1]);
-  const largestDepartment = Math.max(...departmentEntries.map(([, count]) => count), 1);
-  const largestRole = Math.max(...roleEntries.map(([, count]) => count), 1);
-  const attendanceRate = employees.length
-    ? Math.round((presentToday / employees.length) * 100)
-    : 0;
+  const byLeaveType = leaves.reduce<Record<string, number>>((result, leave) => {
+    result[leave.type] = (result[leave.type] ?? 0) + 1;
+    return result;
+  }, {});
   const reportDate = new Intl.DateTimeFormat("en-IN", {
     day: "2-digit",
-    month: "short",
+    month: "long",
     year: "numeric",
   }).format(new Date());
 
-  return (
-    <div className="mx-auto max-w-7xl text-slate-900">
-      <section className="relative overflow-hidden rounded-2xl border border-cyan-600 bg-cyan-700 px-6 py-7 shadow-xl shadow-cyan-950/15 sm:px-8">
-        <div className="absolute inset-0 opacity-[0.12] [background-image:linear-gradient(90deg,#ffffff_1px,transparent_1px),linear-gradient(#ffffff_1px,transparent_1px)] [background-size:32px_32px]" />
-        <div className="relative flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-cyan-100">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_2px_rgb(74_222_128)]" />
-              Operations control room
-            </div>
-            <h1 className="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">Workforce reports</h1>
-            <p className="mt-2 max-w-xl text-sm leading-6 text-slate-400">
-              Live personnel and attendance intelligence across the facility.
-            </p>
-          </div>
-          <div className="border-l-2 border-white/70 pl-4 text-sm text-cyan-100">
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-cyan-200">Report date</p>
-            <p className="mt-1 font-semibold text-white">{reportDate}</p>
-          </div>
-        </div>
-      </section>
+  return <div className="mx-auto max-w-7xl text-[#1F2937]">
+    <header className="flex flex-col gap-5 rounded-3xl border border-slate-200 bg-white p-6 shadow-lg shadow-blue-950/[0.05] backdrop-blur-2xl sm:flex-row sm:items-end sm:justify-between sm:p-8">
+      <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3B82F6]">Admin workspace</p><h1 className="mt-2 text-2xl font-black tracking-tight sm:text-3xl">Reports &amp; analytics</h1><p className="mt-2 text-sm text-slate-600">Workforce and attendance summaries from the connected records.</p><p className="mt-3 text-xs font-semibold text-slate-500">Report date · {reportDate}</p></div>
+      <ReportActions records={attendance} />
+    </header>
 
-      <section className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <MetricCard label="Total workforce" value={employees.length} code="HR-01" accent="amber" />
-        <MetricCard label="On site today" value={presentToday} code="AT-24" accent="emerald" detail={`${attendanceRate}% attendance`} />
-        <MetricCard label="Leave queue" value={pendingLeaves} code="LV-08" accent="orange" detail="Awaiting action" />
-        <MetricCard label="Active divisions" value={departmentEntries.length} code="DP-16" accent="sky" detail="Department groups" />
-      </section>
+    <section className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <Metric label="Total workforce" value={employees.length} detail="Registered accounts" />
+      <Metric label="Present today" value={presentToday} detail={`Of ${todayRecords.length} today's attendance records`} />
+      <Metric label="Absent today" value={absentToday} detail="Explicitly marked absent" />
+      <Metric label="Pending leave" value={pendingLeaves} detail="Requests waiting for a decision" />
+    </section>
 
-      <section className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-5">
-        <div className="overflow-hidden rounded-2xl border border-slate-800 bg-white shadow-sm xl:col-span-3">
-          <PanelHeader title="Department load" code="HEADCOUNT / DIVISION" />
-          {departmentEntries.length === 0 ? (
-            <EmptyPanel />
-          ) : (
-            <ul className="divide-y divide-slate-100 px-6">
-              {departmentEntries.map(([department, count], index) => (
-                <BarRow key={department} label={department} value={count} max={largestDepartment} index={index} />
-              ))}
-            </ul>
-          )}
-        </div>
+    <section className="mt-5 grid gap-5 xl:grid-cols-3">
+      <Distribution title="Department headcount" entries={Object.entries(byDepartment)} />
+      <Distribution title="Accounts by role" entries={Object.entries(byRole)} />
+      <Distribution title="Leave requests by type" entries={Object.entries(byLeaveType)} />
+    </section>
 
-        <div className="overflow-hidden rounded-2xl border border-slate-800 bg-white shadow-sm xl:col-span-2">
-          <PanelHeader title="Role distribution" code="HEADCOUNT / ACCESS" />
-          {roleEntries.length === 0 ? (
-            <EmptyPanel />
-          ) : (
-            <ul className="divide-y divide-slate-100 px-6">
-              {roleEntries.map(([role, count], index) => (
-                <BarRow key={role} label={role} value={count} max={largestRole} index={index} compact />
-              ))}
-            </ul>
-          )}
-        </div>
-      </section>
-    </div>
-  );
+    <section className="mt-5 rounded-3xl border border-slate-200 bg-white p-6 shadow-lg shadow-blue-950/[0.05] backdrop-blur-xl">
+      <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3B82F6]">Attendance period</p><h2 className="mt-1 text-lg font-bold">This month</h2></div><Link href="/admin/attendance" className="text-sm font-semibold text-[#3B82F6] hover:text-[#24445F]">Filter individual records →</Link></div>
+      <div className="mt-5 grid gap-3 sm:grid-cols-3"><Metric label="Attendance records" value={monthRecords.length} detail="Records submitted this month" /><Metric label="Present records" value={monthRecords.filter((record) => record.status === "PRESENT").length} detail="Marked present" /><Metric label="Attendance rate today" value={`${attendanceRate}%`} detail="Present / records submitted today" /></div>
+      <p className="mt-4 text-xs leading-5 text-slate-500">No record is treated as an absence. Late arrival reporting requires configured shift hours; corrections require an audited backend endpoint.</p>
+    </section>
+  </div>;
 }
 
-function MetricCard({ label, value, code, detail, accent }: { label: string; value: number; code: string; detail?: string; accent: "amber" | "emerald" | "orange" | "sky" }) {
-  const accents = { amber: "bg-cyan-400", emerald: "bg-cyan-500", orange: "bg-cyan-600", sky: "bg-sky-500" };
-  return <article className="relative overflow-hidden rounded-xl border border-cyan-100 bg-white p-5 shadow-sm"><div className={`absolute inset-x-0 top-0 h-1 ${accents[accent]}`} /><div className="flex items-start justify-between"><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">{label}</p><span className="rounded border border-cyan-100 px-1.5 py-0.5 font-mono text-[10px] text-cyan-700">{code}</span></div><p className="mt-5 text-4xl font-black tracking-tight text-slate-950">{value}</p><p className="mt-2 text-xs text-slate-500">{detail ?? "Current system count"}</p></article>;
+function Metric({ label, value, detail }: { label: string; value: number | string; detail: string }) {
+  return <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm shadow-blue-950/[0.04] backdrop-blur-xl"><p className="text-xs font-semibold text-slate-500">{label}</p><p className="mt-2 text-2xl font-black tracking-tight text-[#1F2937]">{value}</p><p className="mt-1 text-xs text-slate-500">{detail}</p></article>;
 }
 
-function PanelHeader({ title, code }: { title: string; code: string }) {
-  return <header className="flex items-center justify-between border-b border-cyan-100 bg-cyan-50 px-6 py-4"><div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-cyan-700">{code}</p><h2 className="mt-1 text-base font-extrabold text-slate-900">{title}</h2></div><span className="h-2.5 w-2.5 rounded-full bg-cyan-500" /></header>;
+function Distribution({ title, entries }: { title: string; entries: [string, number][] }) {
+  const max = Math.max(...entries.map(([, count]) => count), 1);
+  return <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg shadow-blue-950/[0.05] backdrop-blur-xl"><p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3B82F6]">Workforce distribution</p><h2 className="mt-1 text-lg font-bold">{title}</h2>{entries.length ? <ul className="mt-5 space-y-4">{entries.sort((a, b) => b[1] - a[1]).map(([label, count]) => <li key={label}><div className="flex justify-between text-sm"><span className="font-medium text-slate-700">{label}</span><span className="font-bold text-slate-900">{count}</span></div><div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-200/75"><div className="h-full rounded-full bg-gradient-to-r from-[#3B82F6] to-[#24445F]" style={{ width: `${Math.max((count / max) * 100, 5)}%` }} /></div></li>)}</ul> : <p className="mt-5 text-sm text-slate-500">No workforce data available.</p>}</article>;
 }
-
-function BarRow({ label, value, max, index, compact = false }: { label: string; value: number; max: number; index: number; compact?: boolean }) {
-  const barColors = ["bg-amber-400", "bg-orange-500", "bg-sky-500", "bg-emerald-500"];
-  return <li className="py-4"><div className="flex items-center justify-between gap-4 text-sm"><span className="truncate font-semibold text-slate-700">{label}</span><span className="shrink-0 font-mono text-xs font-bold text-slate-950">{value.toString().padStart(2, "0")}</span></div><div className={`mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100 ${compact ? "" : "max-w-2xl"}`}><div className={`h-full rounded-full ${barColors[index % barColors.length]}`} style={{ width: `${Math.max((value / max) * 100, 5)}%` }} /></div></li>;
-}
-
-function EmptyPanel() { return <p className="px-6 py-10 text-sm text-slate-400">No operational data recorded yet.</p>; }

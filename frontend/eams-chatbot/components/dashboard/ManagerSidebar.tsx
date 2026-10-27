@@ -4,6 +4,10 @@
 import RoleWorkspaceSidebar from "./RoleWorkspaceSidebar";
 import type { SidebarCollapseProps } from "./SidebarHeader";
 
-export default function ManagerSidebar(props: SidebarCollapseProps) {
+export default function ManagerSidebar(
+  props: SidebarCollapseProps & {
+    onNavigate?: () => void;
+  },
+) {
   return <RoleWorkspaceSidebar role="MANAGER" {...props} />;
 }

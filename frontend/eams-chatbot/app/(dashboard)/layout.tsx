@@ -1,15 +1,13 @@
-// app/(dashboard)/layout.tsx
-// Shared shell for all four dashboards. Reads the session ON THE SERVER
-// (via the cookie) so the correct sidebar renders with no client-side
-// flash of the wrong UI. Actual page content (attendance, leaves, etc.)
-// renders as `children` inside each role's own route folder.
+// Shared shell for all four dashboards. Reads the session on the server so
+// the correct workspace renders without a client-side role flash.
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { decodeSession, AUTH_COOKIE_NAME } from "@/lib/auth/session";
-import ChatLauncher from "@/components/chatbot/ChatLauncher";
 import DashboardShell from "@/components/dashboard/DashboardShell";
+import ChatLauncher from "@/components/chatbot/ChatLauncher";
+import { decodeSession, AUTH_COOKIE_NAME } from "@/lib/auth/session";
 import { employeeDisplayName } from "./employee/employeeName";
+import { getMyProfile } from "@/lib/server/profile";
 
 export default async function DashboardLayout({
   children,
@@ -20,15 +18,17 @@ export default async function DashboardLayout({
   const token = cookieStore.get(AUTH_COOKIE_NAME)?.value;
   const user = decodeSession(token);
 
-  // Belt-and-suspenders: middleware already guards these routes, but a
-  // server component should never assume a null user can't reach here.
   if (!user) {
     redirect("/login");
   }
 
+  const profile = await getMyProfile();
+  const fallbackName = user.role === "ADMIN" ? "Admin" : user.role === "HR" ? "HR" : user.role === "MANAGER" ? "Manager" : "Employee";
+  const displayName = employeeDisplayName(profile?.name) ?? employeeDisplayName(user.name) ?? fallbackName;
+
   return (
     <>
-      <DashboardShell role={user.role} employeeName={user.role === "EMPLOYEE" ? employeeDisplayName(user.name) ?? undefined : undefined}>{children}</DashboardShell>
+      <DashboardShell role={user.role} userName={displayName} email={user.email}>{children}</DashboardShell>
       <ChatLauncher />
     </>
   );

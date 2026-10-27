@@ -36,5 +36,6 @@ public class Employee {
     private String managerId;
 
     private LocalDate dateOfJoining;
+    private LocalDate dateOfBirth;
     private String contactNumber;
 }
