@@ -6,7 +6,6 @@ import { employeeDisplayName } from "../employeeName";
 import type { AttendanceResponse } from "@/types/attendance";
 
 const TIME_ZONE = "Asia/Kolkata";
-
 export default async function MyAttendancePage() {
   const [user, attendanceResult, corrections] = await Promise.all([getCurrentUser(), getEmployeeAttendance(), getAttendanceCorrections()]);
   const records = attendanceResult.records;
@@ -55,10 +54,13 @@ export default async function MyAttendancePage() {
 
 function AttendanceRow({ record }: { record: AttendanceResponse }) {
   const weekend = !isWeekday(record.date);
-  const sessions = record.sessions?.length ? record.sessions : record.checkIn ? [{ sessionId: "legacy", checkIn: record.checkIn, checkOut: record.checkOut }] : [];
-  const duration = typeof record.totalWorkedSeconds === "number" ? record.totalWorkedSeconds : sessions.reduce((sum, session) => sum + (session.checkOut ? Math.max(0, Math.floor((Date.parse(session.checkOut) - Date.parse(session.checkIn)) / 1000)) : 0), 0);
-  const durationLabel = sessions.length ? `${Math.floor(duration / 3600)}h ${Math.floor(duration % 3600 / 60)}m ${duration % 60}s` : "—";
-  return <tr className="hover:bg-slate-100/60"><td className="px-4 py-3 font-medium text-[#1F2937]">{formatDate(record.date)}</td><td className="px-4 py-3">{weekdayName(record.date)}{weekend && <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] text-slate-600">Weekly Off · recorded shift</span>}</td><td className="px-4 py-3">{sessions.length ? sessions.map((session, index) => <div key={session.sessionId}>S{index + 1} · {formatTime(session.checkIn)}</div>) : "—"}</td><td className="px-4 py-3">{sessions.length ? sessions.map((session, index) => <div key={session.sessionId}>S{index + 1} · {formatTime(session.checkOut)}</div>) : "—"}</td><td className="px-4 py-3">{durationLabel}</td><td className="px-4 py-3"><span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-[#24445F]">{record.status}</span></td></tr>;
+  const duration = typeof record.totalWorkedSeconds === "number"
+    ? record.totalWorkedSeconds
+    : record.checkIn && record.checkOut
+      ? Math.max(0, Math.floor((Date.parse(record.checkOut) - Date.parse(record.checkIn)) / 1000))
+      : null;
+  const durationLabel = duration === null ? "—" : `${Math.floor(duration / 3600)}h ${Math.floor(duration % 3600 / 60)}m ${duration % 60}s`;
+  return <tr className="hover:bg-slate-100/60"><td className="px-4 py-3 font-medium text-[#1F2937]">{formatDate(record.date)}</td><td className="px-4 py-3">{weekdayName(record.date)}{weekend && <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] text-slate-600">Weekly Off · recorded shift</span>}</td><td className="px-4 py-3">{formatTime(record.checkIn)}</td><td className="px-4 py-3">{formatTime(record.checkOut)}</td><td className="px-4 py-3">{durationLabel}</td><td className="px-4 py-3"><span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-[#24445F]">{record.status}</span></td></tr>;
 }
 
 function Summary({ label, value, detail }: { label: string; value: string; detail: string }) { return <article className="rounded-2xl border border-slate-200 bg-white p-5 text-[#1F2937] shadow-md"><p className="text-sm text-[#64748B]">{label}</p><p className="mt-3 text-2xl font-bold text-[#24445F]">{value}</p><p className="mt-1 text-xs leading-5 text-[#64748B]">{detail}</p></article>; }
