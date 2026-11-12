@@ -5,7 +5,11 @@
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
 ![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![Maven](https://img.shields.io/badge/Maven-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white)
+![Lombok](https://img.shields.io/badge/Lombok-BC4521?style=for-the-badge)
 ![MongoDB](https://img.shields.io/badge/MongoDB_Atlas-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
+![Zustand](https://img.shields.io/badge/Zustand-433E38?style=for-the-badge)
+![TanStack Query](https://img.shields.io/badge/TanStack_Query-FF4154?style=for-the-badge&logo=reactquery&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
 
 EAMS is a role-based portal for managing employee **attendance, leave, and salary**. It includes a built-in **AI assistant** that answers natural-language questions ("who's on leave today?", "how many leave days do I have left?") using only the data the signed-in user is allowed to see.
@@ -16,6 +20,7 @@ EAMS is a role-based portal for managing employee **attendance, leave, and salar
 
 ## 📑 Table of Contents
 
+- [Tech Stack](#-tech-stack)
 - [Roles and Permissions](#-roles-and-permissions)
 - [How Access Control Works](#-how-access-control-works)
 - [Authentication Flow](#-authentication-flow)
@@ -23,6 +28,17 @@ EAMS is a role-based portal for managing employee **attendance, leave, and salar
 - [Setup](#-setup)
 - [Project Status](#-project-status)
 - [Security Notes](#-security-notes)
+
+---
+
+## 🧰 Tech Stack
+
+| Layer | Technologies |
+|---|---|
+| Frontend | Next.js 14+ (App Router), TypeScript, Tailwind CSS, Zustand, TanStack Query |
+| Backend | Spring Boot 4, Java, Spring Security, Maven, Lombok |
+| Database | MongoDB Atlas |
+| Auth | JWT (httpOnly cookie on the frontend, Bearer token to the backend), bcrypt |
 
 ---
 
@@ -186,6 +202,7 @@ Each pending frontend page already calls the endpoint shape described above, so 
 - Every protected backend endpoint enforces its own role check with `@PreAuthorize`. Hiding a button or link in the frontend is a UX convenience, never the real security boundary.
 
 ---
+
 ## 👩‍💻 Author
 
 **Sukanya Rana** — [GitHub](https://github.com/Sukanya1103) · [LinkedIn](https://www.linkedin.com/in/sukanya-rana-719832345)
